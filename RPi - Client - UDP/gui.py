@@ -45,11 +45,12 @@ else:
 		f.write('clicksounds=1\n')
 		f.close()
 
+#region UpperRightStuff
 class UpperRightIndicator(FloatLayout):
 	lbl_dot = ObjectProperty()
 	lbl_time = ObjectProperty()
 
-	def __init__(self, **kwargs):
+	def __init__(self, lblText='neXn-Systems', **kwargs):
 		super().__init__(**kwargs)
 		#BlackBox behind
 		maincnv = Label(pos=(457,445), size=(315,25), size_hint=(None,None))
@@ -57,9 +58,10 @@ class UpperRightIndicator(FloatLayout):
 			Color(0,0,0,1)
 			Rectangle(pos=maincnv.pos, size=maincnv.size)
 
-		lbl_box = Label(text='neXn-Systems', pos=(460,445), size=(120,25), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='28sp')
-		self.lbl_dot = Label(text='', pos=(690,445), size=(5,25), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='28sp')
-		self.lbl_time = Label(text='', pos=(705,445), size=(60,25), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='28sp')
+		lbl_box = Label(text=lblText, pos=(459,440), size=(225,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='28sp')
+		lbl_box.bind(texture_size=lbl_box.setter('size'))
+		self.lbl_dot = Label(text='', pos=(690,445), size=(5,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='28sp')
+		self.lbl_time = Label(text='', pos=(705,445), size=(60,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='28sp')
 
 		self.add_widget(maincnv)
 		self.add_widget(lbl_box)
@@ -81,7 +83,22 @@ class UpperRightIndicator(FloatLayout):
 	def timerTime(self, instance):
 		now = datetime.datetime.now()
 		self.lbl_time.text = now.strftime('%H:%M:%S')
+#endregion
 
+class ColorConversion():
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		return
+	
+	def RGBA_to_Float(self, R, G, B, A=255):
+		R = float("{0:.2f}".format(R/255))
+		G = float("{0:.2f}".format(G/255))
+		B = float("{0:.2f}".format(B/255))
+		A = float("{0:.2f}".format(A/255))
+
+		return (R,G,B,A)
+
+# region Buttons & LeftNavigation
 class MyButton(ButtonBehavior, Label):
 	def on_press(self):
 		if clicksounds:
@@ -96,104 +113,89 @@ class MyButton(ButtonBehavior, Label):
 		sound = SoundLoader.load(sounds[rndint])
 		sound.play()
 
-class Navigation(RelativeLayout):
-	def __init__(self, **kwargs):
+
+
+class ButtonLeftNavigation(FloatLayout):
+	def __init__(self, btnText, btnEnumPosition, btnEnumColor, btnEnumFunction, **kwargs):
 		super().__init__(**kwargs)
-		#button0
-		btn0 = MyButton(pos=(11,383), size=(96,40), size_hint=(None,None))
-		with btn0.canvas.before:
-			Color(1,1,0.2,1)
-			Rectangle(pos=btn0.pos, size=btn0.size)
-		btn0_txt = Label(text='[b]CONFIGURE[/b]', pos=(btn0.pos[0]+4,btn0.pos[1]+2), size=(50,13), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='22sp', color=(0,0,0,1), markup=True)
 
-		self.add_widget(btn0)
-		self.add_widget(btn0_txt)
+		btn = MyButton(pos=self.EnumPosition(self, btnEnumPosition), size=(96,40), size_hint=(None,None))
+		with btn.canvas.before:
+			if btnEnumColor == 0: #Yellow
+				Color(1,1,0.2,1)
+			if btnEnumColor == 1: #Light yellow
+				Color(0.95,0.99,0.44,1)
+			if btnEnumColor == 2: #Blue
+				Color(0.6,0.8,1,1)
+			Rectangle(pos=btn.pos, size=btn.size)
+		btn_txt = Label(text=btnText, pos=(btn.pos[0]+2,btn.pos[1]-5), size=(50,13), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', color=(0,0,0,1))
+		btn_txt.bind(texture_size=btn_txt.setter('size'))
 
-		#button1
-		btn1 = MyButton(pos=(11,336), size=(96,40), size_hint=(None,None))
-		with btn1.canvas.before:
-			Color(0.6,0.8,1,1)
-			Rectangle(pos=btn1.pos, size=btn1.size)
-		btn1_txt = Label(text='[b]OPTIONS[/b]', pos=(btn1.pos[0]+4,btn1.pos[1]+2), size=(40,13), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='22sp', color=(0,0,0,1), markup=True)
+		btn.bind(on_press=self.EnumFunctions(self, btnEnumFunction))
+		btn_txt.bind(on_press=self.EnumFunctions(self, btnEnumFunction))
 
-		self.add_widget(btn1)
-		self.add_widget(btn1_txt)
+		self.add_widget(btn)
+		self.add_widget(btn_txt)
 
-		#button2
-		btn2 = MyButton(pos=(11,290), size=(96,40), size_hint=(None,None))
-		with btn2.canvas.before:
-			Color(0.6,0.8,1,1)
-			Rectangle(pos=btn2.pos, size=btn2.size)
-		btn2_txt = Label(text='[b]OPTIONS[/b]', pos=(btn2.pos[0]+4,btn2.pos[1]+2), size=(40,13), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='22sp', color=(0,0,0,1), markup=True)
+	def EnumFunctions(self, instance, enum):
+		if enum == 0:
+			return self.exitapp
+		if enum == 1:
+			return self.elitedangerous_pips
 
-		self.add_widget(btn2)
-		self.add_widget(btn2_txt)
-
-		#button3
-		btn3 = MyButton(pos=(11,243), size=(96,40), size_hint=(None,None))
-		with btn3.canvas.before:
-			Color(0.6,0.8,1,1)
-			Rectangle(pos=btn3.pos, size=btn3.size)
-		btn3_txt = Label(text='[b]OPTIONS[/b]', pos=(btn3.pos[0]+4,btn3.pos[1]+2), size=(40,13), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='22sp', color=(0,0,0,1), markup=True)
-
-		self.add_widget(btn3)
-		self.add_widget(btn3_txt)
-
-		#button4
-		btn4 = MyButton(pos=(11,196), size=(96,40), size_hint=(None,None))
-		with btn4.canvas.before:
-			Color(0.6,0.8,1,1)
-			Rectangle(pos=btn4.pos, size=btn4.size)
-		btn4_txt = Label(text='[b]OPTIONS[/b]', pos=(btn4.pos[0]+4,btn4.pos[1]+2), size=(40,13), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='22sp', color=(0,0,0,1), markup=True)
-
-		self.add_widget(btn4)
-		self.add_widget(btn4_txt)
-
-		#button5
-		btn5 = MyButton(pos=(11,150), size=(96,40), size_hint=(None,None))
-		with btn5.canvas.before:
-			Color(0.6,0.8,1,1)
-			Rectangle(pos=btn5.pos, size=btn5.size)
-		btn5_txt = Label(text='[b]OPTIONS[/b]', pos=(btn5.pos[0]+4,btn5.pos[1]+2), size=(40,13), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='22sp', color=(0,0,0,1), markup=True)
-
-		self.add_widget(btn5)
-		self.add_widget(btn5_txt)
-
-		#button6
-		btn6 = MyButton(pos=(11,103), size=(96,40), size_hint=(None,None))
-		with btn6.canvas.before:
-			Color(0.6,0.8,1,1)
-			Rectangle(pos=btn6.pos, size=btn6.size)
-		btn6_txt = Label(text='[b]Elite[/b]', pos=(btn6.pos[0]+4,btn6.pos[1]+2), size=(40,13), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='22sp', color=(0,0,0,1), markup=True)
-
-		btn6.bind(on_press=self.elitedangerous)
-		self.add_widget(btn6)
-		self.add_widget(btn6_txt)
-
-		#button7
-		btn7 = MyButton(pos=(11,56), size=(96,40), size_hint=(None,None))
-		with btn7.canvas.before:
-			Color(1,1,0.2,1)
-			Rectangle(pos=btn7.pos, size=btn7.size)
-		btn7_txt = Label(text='[b]EXIT[/b]', pos=(btn7.pos[0]+4,btn7.pos[1]+2), size=(20,13), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='22sp', color=(0,0,0,1), markup=True)
-		btn7.bind(on_press=self.exitapp)
-		self.add_widget(btn7)
-		self.add_widget(btn7_txt)
+	def elitedangerous_pips(self, instance):
+		self.add_widget(ContentGrid_EliteDangerous(),-1)
+		#self.clear_widgets()
 
 	def exitapp(self, instance):
 		App.get_running_app().stop()
 
-	def elitedangerous(self, instance):
-		#MainLayout.remove(MainLayout)
-		#self.add_widget(ContentGrid_EliteDangerous())
-		app = App.get_running_app()
-		print(app.ids)
+	def EnumPosition(self, instance, enum):
+		if enum == 0:
+			return (11,383)
+		if enum == 1:
+			return (11,336)
+		if enum == 2:
+			return (11,290)
+		if enum == 3:
+			return (11,243)
+		if enum == 4:
+			return (11,196)
+		if enum == 5:
+			return (11,150)
+		if enum == 6:
+			return (11,103)
+		if enum == 7:
+			return (11,56)
+
+
+class Navigation(RelativeLayout):
+	def __init__(self, init_or_dont=1, **kwargs):
+		super().__init__(**kwargs)
+
+		self.add_widget(ButtonLeftNavigation('elite pips', 5, 1, 1))
+		self.add_widget(ButtonLeftNavigation('exit', 7, 2, 0))
+# endregion
+
+class BoundryRect(FloatLayout):
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		boundryrect = Label(pos=(107,63), size=(675,354), size_hint=(None,None))
+
+		with boundryrect.canvas.before:
+			Color(0, 0, 0, 1)
+			Rectangle(pos=boundryrect.pos, size=boundryrect.size)
+		self.add_widget(boundryrect)
 
 class ContentGrid_WelcomeScreen(FloatLayout):
+	primary = None
+
 	def __init__(self, **kwargs):
 		super(ContentGrid_WelcomeScreen, self).__init__(**kwargs)
-		primary = Label(text='PRIMARY SYSTEMS TERMINAL', pos=(264,339), size=(362,37), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='64sp')
-		self.add_widget(primary)
+		self.add_widget(BoundryRect())
+
+		self.primary = Label(text='PRIMARY SYSTEMS TERMINAL', pos=(264,339), size=(362,37), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='64sp')
+		self.add_widget(self.primary)
 		logo = Image(source='img/logo.png', pos=(227,182), size_hint=(None,None), size=(436,136))
 		self.add_widget(logo)
 		access = Label(text='ACCESS GRANTED', pos=(338,93), size=(214,38), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='64sp')
@@ -202,6 +204,7 @@ class ContentGrid_WelcomeScreen(FloatLayout):
 class ContentGrid_EliteDangerous(FloatLayout):
 	def __init__(self, **kwargs):
 		super(ContentGrid_EliteDangerous, self).__init__(**kwargs)
+		self.add_widget(BoundryRect())
 
 		#button reset
 		btn0 = MyButton(pos=(328,117), size=(233,46), size_hint=(None,None))
@@ -288,8 +291,8 @@ class MainLayout(FloatLayout):
 
 		self.add_widget(Navigation())
 		self.add_widget(UpperRightIndicator())
-		#self.add_widget(ContentGrid_WelcomeScreen())
-		self.add_widget(ContentGrid_EliteDangerous())
+		self.add_widget(ContentGrid_WelcomeScreen())
+		#self.add_widget(ContentGrid_EliteDangerous())
 
 	def remove(self):
 		self.remove_widget(self.bg)
