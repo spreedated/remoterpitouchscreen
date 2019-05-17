@@ -6,6 +6,7 @@ import random
 import configparser
 import datetime
 import pprint
+import time
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
@@ -135,7 +136,7 @@ class ColorConversion():
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		return
-	
+
 	def RGBA_to_Float(self, R, G, B, A=255):
 		R = float("{0:.2f}".format(R/255))
 		G = float("{0:.2f}".format(G/255))
@@ -220,7 +221,7 @@ class MainLayout(FloatLayout):
 		if enum == 7:
 			return (11,56)
 
-#region Buttons	
+#region Buttons
 	def ButtonCreation_LeftNavigation(self, btnText, btnEnumPosition, btnEnumColor, btnClickSounds=0, btnEnumFunction=None):
 		btn = MyButton(pos=self.EnumPosition(self, btnEnumPosition), size=(96,40), size_hint=(None,None), id='btnLeftNavigation')
 		with btn.canvas.before:
@@ -277,7 +278,7 @@ class MainLayout(FloatLayout):
 		self.add_widget(btn_downLeft)
 		btn_downRight = MyImageButton(source=cornerImages[3], pos=(position[0]+width+33,position[1]-1), size_hint=(None,None), size=(32,32), id=id)
 		self.add_widget(btn_downRight)
-		
+
 		btn_upCenter = MyButton(pos=(position[0]+32,position[1]+height), size=(width+2,32), size_hint=(None,None), id=id)
 		with btn_upCenter.canvas.before:
 			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
@@ -305,7 +306,7 @@ class MainLayout(FloatLayout):
 			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
 			Rectangle(pos=btn_Center.pos, size=btn_Center.size)
 		self.add_widget(btn_Center)
-		
+
 		btn_lbl = MyButton(text=labeltext, pos=(position[0],position[1]+14), size=(width+65,32), size_hint=(None,None), color=(foregroundColor[0],foregroundColor[1],foregroundColor[2],foregroundColor[3]), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size=textsize, id=id, halign='center')
 		self.add_widget(btn_lbl)
 
@@ -320,7 +321,7 @@ class MainLayout(FloatLayout):
 			if soundFile != None:
 				x.bind(on_press=lambda a:self.PlaySound(soundFile))
 
-		
+
 #endregion
 
 	Pages = ['Welcome','ElitePIPS', 'EliteLimpets', 'Exit']
@@ -467,19 +468,22 @@ class MainLayout(FloatLayout):
 			os.system('python "' + os.getcwd() + '/'+config_socketfile+'" typewrite ' + key)
 
 	def btn_limpets_collector(self, instance):
-		sequence = ['{DOWN}', '{UP}', '{UP}', '{UP}']
+		sequence = ['{VK_NUMPAD4}', '{VK_NUMPAD4}', '{VK_ADD}', '{VK_NUMPAD4}']
 		for key in sequence:
 			os.system('python "' + os.getcwd() + '/'+config_socketfile+'" key ' + key)
+			time.sleep(0.1)
 
 	def btn_limpets_decon(self, instance):
-		sequence = ['{DOWN}', '{UP}', '{UP}', '{UP}']
+		sequence = ['{VK_NUMPAD4}', '{VK_NUMPAD0}', '{VK_NUMPAD6}']
 		for key in sequence:
 			os.system('python "' + os.getcwd() + '/'+config_socketfile+'" key ' + key)
+			time.sleep(0.1)
 
 	def btn_limpets_repair(self, instance):
-		sequence = ['{DOWN}', '{UP}', '{UP}', '{UP}']
+		sequence = ['{VK_NUMPAD4}', '{VK_ADD}', '{VK_NUMPAD6}']
 		for key in sequence:
 			os.system('python "' + os.getcwd() + '/'+config_socketfile+'" key ' + key)
+			time.sleep(0.1)
 #endregion
 
 #region Sounds

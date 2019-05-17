@@ -36,7 +36,7 @@ def ProcessCommand(cmd):
 	if 'hotkey' in cmd[0]:
 		hotkey(cmd[1],cmd[2])
 	if 'typewrite' in cmd[0]:
-		app = application.Application().connect(title_re='(?i).*notepad$')
+		app = application.Application().connect(title_re='(?i).*elite*client')
 		#app.UntitledNotepad.minimize()
 		app.set_text(cmd[1])
 	if 'program' in cmd[0]:
