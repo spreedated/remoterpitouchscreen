@@ -1,12 +1,16 @@
 #!/usr/bin/python
 import os
 #os.environ['KIVY_GL_BACKEND'] = 'gl'
+#os.environ["KIVY_VIDEO"] = "ffpyplayer"
+#os.environ["KIVY_VIDEO"] = "ffmpeg"
 import sys
 import random
 import configparser
 import datetime
 import pprint
 import time
+import kivy
+kivy.require('1.10.1')
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
@@ -23,6 +27,9 @@ from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.textinput import TextInput
+from kivy.uix.video import Video
+from kivy.core.video import VideoBase
+from kivy.uix.videoplayer import VideoPlayer
 
 if sys.version_info[0] != 3:
 	print("This script requires Python version 3.x")
@@ -54,7 +61,7 @@ else:
 		f.write('\n[SOUND]\n')
 		f.write('clicksounds=1\n')
 		f.close()
-		Logger.info('Configuration : Created sucessfully')
+		Logger.info('Configuration : Created successfully')
 
 if config_socket == 'udp':
 	config_socketfile = 'client_udp.py'
@@ -153,10 +160,55 @@ class MyImageButton(ButtonBehavior, Image):
 	def on_press(self):
 		pass
 
+class myVideo(Video):
+	def on_source(self, instance, value):
+		if self._video is not None:
+			self._video.unload()
+			self._video = None
+		if value:
+			self._trigger_video_load()
+
 class MainLayout(FloatLayout):
+	#region PreloadImages
+	def search_tuple(self, tups, elem):
+		return filter(lambda tup: elem in tup, tups)
+
+	preloadedAssets = []
+	def preload_Assets(self):
+		#preload IMAGES
+		count = 0
+		for file in os.listdir("img"):
+			if file.endswith(".png"):
+				count+=1
+				self.preloadedAssets.append([file, Image(source='img/'+file).texture])
+		if count == 1:
+			Logger.info('Preload : one Imagefile loaded to memory as textures')
+		else:
+			Logger.info('Preload : ' + str(count) + ' Imagefiles loaded to memory as textures')
+		#preload SOUNDS
+		count = 0
+		for r,d,f in os.walk('snd'):
+			for file in os.listdir(r):
+					if file.endswith(".wav"):
+						count+=1
+						self.preloadedAssets.append([os.path.join(r,file), SoundLoader.load(os.path.join(r,file))])
+		if count == 1:
+			Logger.info('Preload : one Soundfile loaded to memory')
+		else:
+			Logger.info('Preload : ' + str(count) + ' Soundfiles loaded to memory')
+
+	def returnPreloadedAsset(self, AssetName):
+		for x in self.preloadedAssets:
+			if AssetName in x[0]:
+				return x[1]
+#endregion
+
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
-		bg = Image(source='img/bg.png', pos=(1,0), size_hint=(None,None), size=(800,480), id='background')
+
+		#Init Functions
+		self.preload_Assets()
+		bg = Image(texture=self.returnPreloadedAsset('bg.png'), pos=(1,0), size_hint=(None,None), size=(800,480), id='background')
 		self.add_widget(bg)
 		txt_menu = Label(text='MENU', pos=(42,435), size=(35,18), size_hint=(None,None), color=(0,0,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='28 sp')
 		self.add_widget(txt_menu)
@@ -192,6 +244,10 @@ class MainLayout(FloatLayout):
 				if child.id != None:
 					for page in self.Pages:
 						if page in child.id:
+							if type(child) == Video:
+								print('vid found')
+								child.state = 'stop'
+								self.remove_widget(child)
 							self.remove_widget(child)
 		Logger.info('PageFunction : Pages cleared')
 
@@ -247,9 +303,9 @@ class MainLayout(FloatLayout):
 		self.add_widget(btn_txt)
 
 	def RoundedButton(self, id, leftimage, rightimage, labeltext, action, position, width, textsize='48sp', backgroundColor=(0.71,0,0.02,1), foregroundColor=(1,1,1,1), clickSound=True, soundFile=None):
-		btn_left = MyImageButton(source=leftimage, pos=position, size_hint=(None,None), size=(23,46), id=id)
+		btn_left = MyImageButton(texture=self.returnPreloadedAsset(leftimage), pos=position, size_hint=(None,None), size=(23,46), id=id)
 		self.add_widget(btn_left)
-		btn_right = MyImageButton(source=rightimage, pos=(position[0]+19+width, position[1]), size_hint=(None,None), size=(23,46), id=id)
+		btn_right = MyImageButton(texture=self.returnPreloadedAsset(rightimage), pos=(position[0]+19+width, position[1]), size_hint=(None,None), size=(23,46), id=id)
 		self.add_widget(btn_right)
 		btn_center = MyButton(pos=(position[0]+21,position[1]+1), size=(width,45), size_hint=(None,None), id=id)
 		with btn_center.canvas.before:
@@ -270,13 +326,13 @@ class MainLayout(FloatLayout):
 	def RoundedButtonSquare(self, id, cornerImages, labeltext, action, position, width, height, iconImage, textsize='48sp', backgroundColor=(0.71,0,0.02,1), foregroundColor=(0,0,0,1), clickSound=True, soundFile=None):
 		width = width-64
 		height = height-32
-		btn_upLeft = MyImageButton(source=cornerImages[0], pos=(position[0],position[1]+height), size_hint=(None,None), size=(32,32), id=id)
+		btn_upLeft = MyImageButton(texture=self.returnPreloadedAsset(cornerImages[0]), pos=(position[0],position[1]+height), size_hint=(None,None), size=(32,32), id=id)
 		self.add_widget(btn_upLeft)
-		btn_upRight = MyImageButton(source=cornerImages[1], pos=(position[0]+width+33,position[1]+height), size_hint=(None,None), size=(32,32), id=id)
+		btn_upRight = MyImageButton(texture=self.returnPreloadedAsset(cornerImages[1]), pos=(position[0]+width+33,position[1]+height), size_hint=(None,None), size=(32,32), id=id)
 		self.add_widget(btn_upRight)
-		btn_downLeft = MyImageButton(source=cornerImages[2], pos=(position[0],position[1]), size_hint=(None,None), size=(32,32), id=id)
+		btn_downLeft = MyImageButton(texture=self.returnPreloadedAsset(cornerImages[2]), pos=(position[0],position[1]), size_hint=(None,None), size=(32,32), id=id)
 		self.add_widget(btn_downLeft)
-		btn_downRight = MyImageButton(source=cornerImages[3], pos=(position[0]+width+33,position[1]-1), size_hint=(None,None), size=(32,32), id=id)
+		btn_downRight = MyImageButton(texture=self.returnPreloadedAsset(cornerImages[3]), pos=(position[0]+width+33,position[1]-1), size_hint=(None,None), size=(32,32), id=id)
 		self.add_widget(btn_downRight)
 
 		btn_upCenter = MyButton(pos=(position[0]+32,position[1]+height), size=(width+2,32), size_hint=(None,None), id=id)
@@ -307,10 +363,14 @@ class MainLayout(FloatLayout):
 			Rectangle(pos=btn_Center.pos, size=btn_Center.size)
 		self.add_widget(btn_Center)
 
-		btn_lbl = MyButton(text=labeltext, pos=(position[0],position[1]+14), size=(width+65,32), size_hint=(None,None), color=(foregroundColor[0],foregroundColor[1],foregroundColor[2],foregroundColor[3]), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size=textsize, id=id, halign='center')
+		btn_lbl = MyButton(text=labeltext, pos=(position[0],position[1]+14), size=(width+64,32), size_hint=(None,None), color=(foregroundColor[0],foregroundColor[1],foregroundColor[2],foregroundColor[3]), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size=textsize, id=id, halign='center')
 		self.add_widget(btn_lbl)
 
-		btn_icon = MyImageButton(source=iconImage, pos=(position[0]+(((width+64)/100)*18),position[1]+(((height+32)/100)*35)), size=(width+(((width+64)/100)*9),height-(((height+32)/100)*22)), size_hint=(None,None), id=id)
+		btn_icon = MyImageButton(texture=self.returnPreloadedAsset(iconImage), pos=(position[0]+((width+64)/2),position[1]+(((height+32)/100)*30)), size=(width+(((width+64)/100)*15),height-(((height+32)/100)*14)), size_hint=(None,None), id=id)
+		btn_icon.pos=(btn_icon.pos[0]-(btn_icon.size[0]/2),btn_icon.pos[1])
+		with btn_icon.canvas.before:
+			Color(1,0.5,0.5,1)
+			Rectangle(pos=btn_icon.pos, size=btn_icon.size)
 		self.add_widget(btn_icon)
 
 		elements = [btn_icon,btn_lbl,btn_Center,btn_rightCenter,btn_leftCenter,btn_downCenter,btn_upCenter,btn_downRight,btn_downLeft,btn_upLeft,btn_upRight]
@@ -339,7 +399,7 @@ class MainLayout(FloatLayout):
 	def exit_page1(self, instance):
 		self.remove_mywidget('Exit_auth')
 		id='Exit'
-		self.RoundedButton(id + '_auth','img/btn_red_rounded_left.png', 'img/btn_red_rounded_right.png', '--- CONFIRM ---', self.exit_page2, (328,81), 197, '42sp', soundFile='deactivation/complete.wav')
+		self.RoundedButton(id + '_auth','btn_red_rounded_left.png', 'btn_red_rounded_right.png', '--- CONFIRM ---', self.exit_page2, (328,81), 197, '42sp', soundFile='complete.wav')
 		Logger.info('PageFunction : Pageswitch - Exit 1')
 
 	def exit_page2(self, instance):
@@ -363,18 +423,19 @@ class MainLayout(FloatLayout):
 		id='Exit'
 		lbl_shutdown = Label(text='COMPUTER CORE\nSHUTDOWN', pos=(282,256), size=(325,152), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='96sp', id=id, halign='center')
 		self.add_widget(lbl_shutdown)
-		self.RoundedButton(id + '_auth','img/btn_red_rounded_left.png', 'img/btn_red_rounded_right.png', '--- AUTHORIZE ---', self.exit_page1, (239,167), 370, soundFile='deactivation/beep.wav')
+		self.RoundedButton(id + '_auth','btn_red_rounded_left.png', 'btn_red_rounded_right.png', '--- AUTHORIZE ---', self.exit_page1, (239,167), 370, soundFile='beep.wav')
 
 	def Page_Welcome(self):
 		id='Welcome'
 		primary = Label(text='PRIMARY SYSTEMS TERMINAL', pos=(264,339), size=(362,37), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='64sp', id=id)
 		self.add_widget(primary)
-		logo = Image(source='img/logo.png', pos=(227,182), size_hint=(None,None), size=(436,136), id=id)
+		#logo = Image(texture=self.returnPreloadedAsset('logo.png'), pos=(227,182), size_hint=(None,None), size=(436,136), id=id)
+		#self.add_widget(logo)
+
+		logo = VideoPlayer(source='vid/forward_scan.avi', pos=(227,182), size_hint=(None,None), size=(436,136), id=id, state='play', options={'allow_stretch':True, 'eos': 'loop'})
 		self.add_widget(logo)
 		access = Label(text='ACCESS GRANTED', pos=(338,93), size=(214,38), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='64sp', id=id)
 		self.add_widget(access)
-		#Init Functions
-		self.fill_pool()
 
 	def Page_ElitePIPS(self):
 		id='ElitePIPS'
@@ -435,11 +496,17 @@ class MainLayout(FloatLayout):
 		btn_positions_first_row=[(124,251),(289,251),(453,251),(618,251)]
 		btn_positions_second_row=[(124,49),(289,49),(453,49),(618,49)]
 		#COLLECTOR
-		self.RoundedButtonSquare(id,('img/btn_orange_upLeft.png','img/btn_orange_upRight.png','img/btn_orange_downLeft.png','img/btn_orange_downRight.png'), 'COLLECTOR', self.btn_limpets_collector, btn_positions_first_row[3], 150, 180, 'img/limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 254,154,0))
+		self.RoundedButtonSquare(id,('btn_orange_upLeft.png','btn_orange_upRight.png','btn_orange_downLeft.png','btn_orange_downRight.png'), 'COLLECTOR', self.btn_limpets_collector, btn_positions_first_row[3], 150, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 254,154,0))
 		#DECON
-		self.RoundedButtonSquare(id,('img/btn_lightblue_upLeft.png','img/btn_lightblue_upRight.png','img/btn_lightblue_downLeft.png','img/btn_lightblue_downRight.png'), 'DECON', self.btn_limpets_decon, btn_positions_first_row[0], 150, 180, 'img/limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 153,205,255))
+		self.RoundedButtonSquare(id,('btn_lightblue_upLeft.png','btn_lightblue_upRight.png','btn_lightblue_downLeft.png','btn_lightblue_downRight.png'), 'DECON', self.btn_limpets_decon, btn_positions_first_row[0], 150, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 153,205,255))
 		#REPAIR
-		self.RoundedButtonSquare(id,('img/btn_green_upLeft.png','img/btn_green_upRight.png','img/btn_green_downLeft.png','img/btn_green_downRight.png'), 'REPAIR', self.btn_limpets_repair, btn_positions_second_row[2], 150, 180, 'img/limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 0,168,89))
+		self.RoundedButtonSquare(id,('btn_green_upLeft.png','btn_green_upRight.png','btn_green_downLeft.png','btn_green_downRight.png'), 'REPAIR', self.btn_limpets_repair, btn_positions_second_row[2], 150, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 0,168,89))
+		#test
+		self.RoundedButtonSquare(id,('btn_green_upLeft.png','btn_green_upRight.png','btn_green_downLeft.png','btn_green_downRight.png'), 'test', self.btn_limpets_repair, btn_positions_second_row[0], 100, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 0,168,89))
+		#test
+		self.RoundedButtonSquare(id,('btn_green_upLeft.png','btn_green_upRight.png','btn_green_downLeft.png','btn_green_downRight.png'), 'test', self.btn_limpets_repair, btn_positions_second_row[1], 80, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 0,168,89))
+		#test
+		self.RoundedButtonSquare(id,('btn_green_upLeft.png','btn_green_upRight.png','btn_green_downLeft.png','btn_green_downRight.png'), 'test', self.btn_limpets_repair, btn_positions_second_row[3], 180, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 0,168,89))
 
 #endregion
 
@@ -463,9 +530,7 @@ class MainLayout(FloatLayout):
 			os.system('python "' + os.getcwd() + '/'+config_socketfile+'" key ' + key)
 
 	def btn_test(self, instance):
-		sequence = ['"what the duck"']
-		for key in sequence:
-			os.system('python "' + os.getcwd() + '/'+config_socketfile+'" typewrite ' + key)
+		print(type(self.returnPreloadedAsset('ringin')))
 
 	def btn_limpets_collector(self, instance):
 		sequence = ['{VK_NUMPAD4}', '{VK_NUMPAD4}', '{VK_ADD}', '{VK_NUMPAD4}']
@@ -488,29 +553,23 @@ class MainLayout(FloatLayout):
 
 #region Sounds
 	#Play RandomSound
-	SoundPool_firstRun = True
-	SoundPool_Clicks = []
-	def fill_pool(self):
-		if self.SoundPool_firstRun == True:
-			for sndfile in os.listdir('snd/clicks/'):
-				self.SoundPool_Clicks.append('snd/clicks/' + str(sndfile))
-			self.SoundPool_firstRun = False
-			Logger.info('Sound Function : Initialized pool')
-		else:
-			Logger.info('Sound Function : Pool already initialized')
-
 	def PlayRndSound(self, instance):
-		rndint = random.randint(0,len(self.SoundPool_Clicks)-1)
-		sound = SoundLoader.load(self.SoundPool_Clicks[rndint])
-		sound.play()
+		rndlist = []
+		count = 0
+		for x in self.preloadedAssets:
+			if 'clicks' in x[0]:
+				count+=1
+				rndlist.append(x[0])
+		rndint = random.randint(0,count-1)
+		self.returnPreloadedAsset(rndlist[rndint]).play()
 
-	def PlaySound(self, soundfile=None):
-		if soundfile != None:
-			try:
-				sound2 = SoundLoader.load('snd/' + soundfile)
-				sound2.play()
-			except Exception as e:
-				print(str(e))
+	def PlaySound(self, soundFileName):
+		x = self.returnPreloadedAsset(soundFileName)
+		if x != None:
+			x.play()
+		else:
+			Logger.error('Sound : File 404')
+
 #endregion
 
 class MainApp(App):
