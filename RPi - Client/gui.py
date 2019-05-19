@@ -1,8 +1,22 @@
 #!/usr/bin/python
 import os
-#os.environ['KIVY_GL_BACKEND'] = 'gl'
-#os.environ["KIVY_VIDEO"] = "ffpyplayer"
-#os.environ["KIVY_VIDEO"] = "ffmpeg"
+#USE kivy.deps.sdl2 == 0.1.18 --- 0.1.20 is BROKEN! <-- colors are all wrong
+#USE kivy.deps.gstreamer == 0.1.13 --- 0.1.14 is BROKEN! <-- took me about 3 hours if my life - 0.1.13 throws some error in console (which should have been fixed in 14 coming from broken symlinks- 14 actually fixed it, but there's no video), but at least it works... somehow
+#USE ffpyplayer == 4.1.0 --- 4.2.0 is BROKEN! <-- took me about 3 hours if my life
+if os.name == 'nt': #for Windows
+	os.environ['KIVY_GL_BACKEND'] = 'angle_sdl2'
+	os.environ['KIVY_AUDIO'] = 'sdl2'
+	os.environ['KIVY_WINDOW'] = 'sdl2'
+	os.environ['KIVY_IMAGE'] = 'sdl2'
+	os.environ['KIVY_VIDEO'] = 'gstplayer' #using kivy.deps.gstreamer
+	#os.environ['KIVY_VIDEO'] = 'ffpyplayer' #i dont like ffpyplayer
+elif os.name == 'posix': #for RPi/Linux
+	os.environ['KIVY_GL_BACKEND'] = 'gl'
+	os.environ['KIVY_AUDIO'] = 'gstplayer'
+	os.environ['KIVY_VIDEO'] = 'gstplayer'
+os.environ['KIVY_TEXT'] = 'sdl2'
+#os.environ["KIVY_NO_CONFIG"] = "1" # produces an error(no input at all) on rpi touchdisplay # DONT USE
+os.environ["KIVY_NO_FILELOG"] = "1" # No spam
 import sys
 import random
 import configparser
@@ -11,11 +25,28 @@ import pprint
 import time
 import kivy
 kivy.require('1.10.1')
+from kivy.config import Config
+if os.name == 'nt':
+	Config.set('graphics', 'show_cursor', '1')
+	Config.set('graphics', 'fullscreen', 'false')
+	Config.set('graphics', 'multisamples', '9')
+elif os.name == 'posix':
+	Config.set('graphics', 'fullscreen', 'true')
+	Config.set('graphics', 'multisamples', '0') # disable AA for better performance
+	Config.set('graphics', 'show_cursor', '0')
+Config.set('kivy', 'exit_on_escape', '1') # Exit with escape key
+Config.set('kivy', 'keyboard_mode', 'systemanddock') # or 'systemandmulti' - still no real difference here
+Config.set('kivy','keyboard_layout', 'qwertz')
+Config.set('kivy','pause_on_minimize', '0')
+Config.set('kivy','window_icon','ico/icon.ico')
+Config.set('kivy', 'show_fps', 1)
+Config.set('graphics', 'window_state', 'normal')
+Config.set('graphics', 'resizable', False)
+Config.write()
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
 from kivy.clock import Clock
-from kivy.config import Config
 from kivy.graphics import Color, Rectangle
 from kivy.properties import StringProperty, ObjectProperty
 from kivy.lang import Builder
@@ -67,6 +98,40 @@ if config_socket == 'udp':
 	config_socketfile = 'client_udp.py'
 elif config_socket == 'tcp':
 	config_socketfile = 'client_tcp.py'
+#endregion
+
+#region PreloadImages
+def search_tuple(self, tups, elem):
+	return filter(lambda tup: elem in tup, tups)
+
+preloadedAssets = []
+def preload_Assets():
+	#preload IMAGES
+	count = 0
+	for file in os.listdir("img"):
+		if file.endswith(".png"):
+			count+=1
+			preloadedAssets.append([file, Image(source='img/'+file).texture])
+	if count == 1:
+		Logger.info('Preload : one Imagefile loaded to memory as textures')
+	else:
+		Logger.info('Preload : ' + str(count) + ' Imagefiles loaded to memory as textures')
+	#preload SOUNDS
+	count = 0
+	for r,d,f in os.walk('snd'):
+		for file in os.listdir(r):
+				if file.endswith(".wav"):
+					count+=1
+					preloadedAssets.append([os.path.join(r,file), SoundLoader.load(os.path.join(r,file))])
+	if count == 1:
+		Logger.info('Preload : one Soundfile loaded to memory')
+	else:
+		Logger.info('Preload : ' + str(count) + ' Soundfiles loaded to memory')
+
+def returnPreloadedAsset(AssetName):
+	for x in preloadedAssets:
+		if AssetName in x[0]:
+			return x[1]
 #endregion
 
 #region TopStatusBar
@@ -160,55 +225,10 @@ class MyImageButton(ButtonBehavior, Image):
 	def on_press(self):
 		pass
 
-class myVideo(Video):
-	def on_source(self, instance, value):
-		if self._video is not None:
-			self._video.unload()
-			self._video = None
-		if value:
-			self._trigger_video_load()
-
 class MainLayout(FloatLayout):
-	#region PreloadImages
-	def search_tuple(self, tups, elem):
-		return filter(lambda tup: elem in tup, tups)
-
-	preloadedAssets = []
-	def preload_Assets(self):
-		#preload IMAGES
-		count = 0
-		for file in os.listdir("img"):
-			if file.endswith(".png"):
-				count+=1
-				self.preloadedAssets.append([file, Image(source='img/'+file).texture])
-		if count == 1:
-			Logger.info('Preload : one Imagefile loaded to memory as textures')
-		else:
-			Logger.info('Preload : ' + str(count) + ' Imagefiles loaded to memory as textures')
-		#preload SOUNDS
-		count = 0
-		for r,d,f in os.walk('snd'):
-			for file in os.listdir(r):
-					if file.endswith(".wav"):
-						count+=1
-						self.preloadedAssets.append([os.path.join(r,file), SoundLoader.load(os.path.join(r,file))])
-		if count == 1:
-			Logger.info('Preload : one Soundfile loaded to memory')
-		else:
-			Logger.info('Preload : ' + str(count) + ' Soundfiles loaded to memory')
-
-	def returnPreloadedAsset(self, AssetName):
-		for x in self.preloadedAssets:
-			if AssetName in x[0]:
-				return x[1]
-#endregion
-
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
-
-		#Init Functions
-		self.preload_Assets()
-		bg = Image(texture=self.returnPreloadedAsset('bg.png'), pos=(1,0), size_hint=(None,None), size=(800,480), id='background')
+		bg = Image(texture=returnPreloadedAsset('bg.png'), pos=(1,0), size_hint=(None,None), size=(800,480), id='background')
 		self.add_widget(bg)
 		txt_menu = Label(text='MENU', pos=(42,435), size=(35,18), size_hint=(None,None), color=(0,0,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='28 sp')
 		self.add_widget(txt_menu)
@@ -245,9 +265,9 @@ class MainLayout(FloatLayout):
 					for page in self.Pages:
 						if page in child.id:
 							if type(child) == Video:
-								print('vid found')
+								child.unload()
+							if type(child) == VideoPlayer:
 								child.state = 'stop'
-								self.remove_widget(child)
 							self.remove_widget(child)
 		Logger.info('PageFunction : Pages cleared')
 
@@ -303,9 +323,9 @@ class MainLayout(FloatLayout):
 		self.add_widget(btn_txt)
 
 	def RoundedButton(self, id, leftimage, rightimage, labeltext, action, position, width, textsize='48sp', backgroundColor=(0.71,0,0.02,1), foregroundColor=(1,1,1,1), clickSound=True, soundFile=None):
-		btn_left = MyImageButton(texture=self.returnPreloadedAsset(leftimage), pos=position, size_hint=(None,None), size=(23,46), id=id)
+		btn_left = MyImageButton(texture=returnPreloadedAsset(leftimage), pos=position, size_hint=(None,None), size=(23,46), id=id)
 		self.add_widget(btn_left)
-		btn_right = MyImageButton(texture=self.returnPreloadedAsset(rightimage), pos=(position[0]+19+width, position[1]), size_hint=(None,None), size=(23,46), id=id)
+		btn_right = MyImageButton(texture=returnPreloadedAsset(rightimage), pos=(position[0]+19+width, position[1]), size_hint=(None,None), size=(23,46), id=id)
 		self.add_widget(btn_right)
 		btn_center = MyButton(pos=(position[0]+21,position[1]+1), size=(width,45), size_hint=(None,None), id=id)
 		with btn_center.canvas.before:
@@ -326,13 +346,13 @@ class MainLayout(FloatLayout):
 	def RoundedButtonSquare(self, id, cornerImages, labeltext, action, position, width, height, iconImage, textsize='48sp', backgroundColor=(0.71,0,0.02,1), foregroundColor=(0,0,0,1), clickSound=True, soundFile=None):
 		width = width-64
 		height = height-32
-		btn_upLeft = MyImageButton(texture=self.returnPreloadedAsset(cornerImages[0]), pos=(position[0],position[1]+height), size_hint=(None,None), size=(32,32), id=id)
+		btn_upLeft = MyImageButton(texture=returnPreloadedAsset(cornerImages[0]), pos=(position[0],position[1]+height), size_hint=(None,None), size=(32,32), id=id)
 		self.add_widget(btn_upLeft)
-		btn_upRight = MyImageButton(texture=self.returnPreloadedAsset(cornerImages[1]), pos=(position[0]+width+33,position[1]+height), size_hint=(None,None), size=(32,32), id=id)
+		btn_upRight = MyImageButton(texture=returnPreloadedAsset(cornerImages[1]), pos=(position[0]+width+33,position[1]+height), size_hint=(None,None), size=(32,32), id=id)
 		self.add_widget(btn_upRight)
-		btn_downLeft = MyImageButton(texture=self.returnPreloadedAsset(cornerImages[2]), pos=(position[0],position[1]), size_hint=(None,None), size=(32,32), id=id)
+		btn_downLeft = MyImageButton(texture=returnPreloadedAsset(cornerImages[2]), pos=(position[0],position[1]), size_hint=(None,None), size=(32,32), id=id)
 		self.add_widget(btn_downLeft)
-		btn_downRight = MyImageButton(texture=self.returnPreloadedAsset(cornerImages[3]), pos=(position[0]+width+33,position[1]-1), size_hint=(None,None), size=(32,32), id=id)
+		btn_downRight = MyImageButton(texture=returnPreloadedAsset(cornerImages[3]), pos=(position[0]+width+33,position[1]-1), size_hint=(None,None), size=(32,32), id=id)
 		self.add_widget(btn_downRight)
 
 		btn_upCenter = MyButton(pos=(position[0]+32,position[1]+height), size=(width+2,32), size_hint=(None,None), id=id)
@@ -366,7 +386,7 @@ class MainLayout(FloatLayout):
 		btn_lbl = MyButton(text=labeltext, pos=(position[0],position[1]+14), size=(width+64,32), size_hint=(None,None), color=(foregroundColor[0],foregroundColor[1],foregroundColor[2],foregroundColor[3]), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size=textsize, id=id, halign='center')
 		self.add_widget(btn_lbl)
 
-		btn_icon = MyImageButton(texture=self.returnPreloadedAsset(iconImage), pos=(position[0]+((width+64)/2),position[1]+(((height+32)/100)*30)), size=(width+(((width+64)/100)*15),height-(((height+32)/100)*14)), size_hint=(None,None), id=id)
+		btn_icon = MyImageButton(texture=returnPreloadedAsset(iconImage), pos=(position[0]+((width+64)/2),position[1]+(((height+32)/100)*30)), size=(width+(((width+64)/100)*15),height-(((height+32)/100)*14)), size_hint=(None,None), id=id)
 		btn_icon.pos=(btn_icon.pos[0]-(btn_icon.size[0]/2),btn_icon.pos[1])
 		with btn_icon.canvas.before:
 			Color(1,0.5,0.5,1)
@@ -429,13 +449,12 @@ class MainLayout(FloatLayout):
 		id='Welcome'
 		primary = Label(text='PRIMARY SYSTEMS TERMINAL', pos=(264,339), size=(362,37), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='64sp', id=id)
 		self.add_widget(primary)
-		#logo = Image(texture=self.returnPreloadedAsset('logo.png'), pos=(227,182), size_hint=(None,None), size=(436,136), id=id)
-		#self.add_widget(logo)
-
-		logo = VideoPlayer(source='vid/forward_scan.avi', pos=(227,182), size_hint=(None,None), size=(436,136), id=id, state='play', options={'allow_stretch':True, 'eos': 'loop'})
+		logo = Image(texture=returnPreloadedAsset('logo.png'), pos=(227,182), size_hint=(None,None), size=(436,136), id=id)
 		self.add_widget(logo)
 		access = Label(text='ACCESS GRANTED', pos=(338,93), size=(214,38), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='64sp', id=id)
 		self.add_widget(access)
+		vid = Video(source='vid/system_prio.mp4', pos=(640,60), size_hint=(None,None), size=(140,140), id=id, state='play', volume='0', options={'allow_stretch':True, 'eos': 'loop'})
+		self.add_widget(vid)
 
 	def Page_ElitePIPS(self):
 		id='ElitePIPS'
@@ -447,6 +466,7 @@ class MainLayout(FloatLayout):
 		btn0_txt = Label(text='[b]RESET[/b]', pos=(328,117), size=(233,46), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', color=(0,0,0,1), markup=True, id=id)
 
 		btn0.bind(on_press=self.btn_reset)
+		btn0.bind(on_press=self.PlayRndSound)
 		btn0_txt.bind(on_press=self.btn_reset)
 
 		self.add_widget(btn0)
@@ -460,6 +480,7 @@ class MainLayout(FloatLayout):
 		btn_system_txt = Label(text='[b]SYSTEM[/b]', pos=(142,216), size=(233,46), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', color=(0,0,0,1), markup=True, id=id)
 
 		btn_system.bind(on_press=self.btn_system)
+		btn_system.bind(on_press=self.PlayRndSound)
 		btn_system_txt.bind(on_press=self.btn_system)
 
 		self.add_widget(btn_system)
@@ -473,6 +494,7 @@ class MainLayout(FloatLayout):
 		btn_weapons_txt = Label(text='[b]WEAPONS[/b]', pos=(511,221), size=(233,46), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', color=(0,0,0,1), markup=True, id=id)
 
 		btn_weapons.bind(on_press=self.btn_weapons)
+		btn_weapons.bind(on_press=self.PlayRndSound)
 		btn_weapons_txt.bind(on_press=self.btn_weapons)
 
 		self.add_widget(btn_weapons)
@@ -486,6 +508,7 @@ class MainLayout(FloatLayout):
 		btn_speed_txt = Label(text='[b]Speed[/b]', pos=(328,319), size=(233,46), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', color=(0,0,0,1), markup=True, id=id)
 
 		btn_speed.bind(on_press=self.btn_speed)
+		btn_speed.bind(on_press=self.PlayRndSound)
 		btn_speed_txt.bind(on_press=self.btn_speed)
 
 		self.add_widget(btn_speed)
@@ -530,7 +553,7 @@ class MainLayout(FloatLayout):
 			os.system('python "' + os.getcwd() + '/'+config_socketfile+'" key ' + key)
 
 	def btn_test(self, instance):
-		print(type(self.returnPreloadedAsset('ringin')))
+		print(type(returnPreloadedAsset('ringin')))
 
 	def btn_limpets_collector(self, instance):
 		sequence = ['{VK_NUMPAD4}', '{VK_NUMPAD4}', '{VK_ADD}', '{VK_NUMPAD4}']
@@ -556,16 +579,17 @@ class MainLayout(FloatLayout):
 	def PlayRndSound(self, instance):
 		rndlist = []
 		count = 0
-		for x in self.preloadedAssets:
+		for x in preloadedAssets:
 			if 'clicks' in x[0]:
 				count+=1
 				rndlist.append(x[0])
 		rndint = random.randint(0,count-1)
-		self.returnPreloadedAsset(rndlist[rndint]).play()
+		returnPreloadedAsset(rndlist[rndint]).play()
 
 	def PlaySound(self, soundFileName):
-		x = self.returnPreloadedAsset(soundFileName)
+		x = returnPreloadedAsset(soundFileName)
 		if x != None:
+			x.seek(0)
 			x.play()
 		else:
 			Logger.error('Sound : File 404')
@@ -575,19 +599,13 @@ class MainLayout(FloatLayout):
 class MainApp(App):
 	def build(self):
 		self.title = 'LCARS'
+		preload_Assets()
 		return MainLayout()
 
 	def on_stop(self):
 		Logger.critical('EXIT : Made with <3')
 
 if __name__ == '__main__':
-	#Window.show_cursor = False
 	#Window.borderless = True
 	Window.size = (800, 480)
-	# Config.set('graphics', 'fullscreen', 'false')
-	# Config.set('graphics', 'window_state', 'normal')
-	Config.set('graphics', 'resizable', False)
-	Config.set('kivy','window_icon','ico/icon.ico')
-	Config.set('kivy', 'show_fps', 1)
-	Config.write()
 	MainApp().run()
