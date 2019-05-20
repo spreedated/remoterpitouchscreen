@@ -5,17 +5,19 @@ import os
 #USE ffpyplayer == 4.1.0 --- 4.2.0 is BROKEN! <-- took me about 3 hours if my life
 if os.name == 'nt': #for Windows
 	os.environ['KIVY_GL_BACKEND'] = 'angle_sdl2'
-	os.environ['KIVY_AUDIO'] = 'sdl2'
+	#os.environ['KIVY_AUDIO'] = 'sdl2' # <-- seems more stable, but cannot play MP3, WAV only
+	os.environ['KIVY_AUDIO'] = 'gstplayer' # <-- can play WAV & MP3, also more accurate on timings, consider it a better alternative
 	os.environ['KIVY_WINDOW'] = 'sdl2'
 	os.environ['KIVY_IMAGE'] = 'sdl2'
-	os.environ['KIVY_VIDEO'] = 'gstplayer' #using kivy.deps.gstreamer
+	os.environ['KIVY_VIDEO'] = 'null' # use for debug, no video, no warnings in console
+	#os.environ['KIVY_VIDEO'] = 'gstplayer' #using kivy.deps.gstreamer
 	#os.environ['KIVY_VIDEO'] = 'ffpyplayer' #i dont like ffpyplayer
 elif os.name == 'posix': #for RPi/Linux
 	os.environ['KIVY_GL_BACKEND'] = 'gl'
 	os.environ['KIVY_AUDIO'] = 'gstplayer'
 	os.environ['KIVY_VIDEO'] = 'gstplayer'
 os.environ['KIVY_TEXT'] = 'sdl2'
-#os.environ["KIVY_NO_CONFIG"] = "1" # produces an error(no input at all) on rpi touchdisplay # DONT USE
+#os.environ["KIVY_NO_CONFIG"] = "0" # BROKEN -- produces an error(no input at all) on rpi touchdisplay # DONT USE
 os.environ["KIVY_NO_FILELOG"] = "1" # No spam
 import sys
 import random
@@ -42,6 +44,10 @@ Config.set('kivy','window_icon','ico/icon.ico')
 Config.set('kivy', 'show_fps', 1)
 Config.set('graphics', 'window_state', 'normal')
 Config.set('graphics', 'resizable', False)
+# DEBUG
+Config.set('modules', 'touchring', 'scale=0.1,alpha=1')
+Config.set('modules', 'monitor', '')
+# ###
 Config.write()
 from kivy.app import App
 from kivy.core.window import Window
@@ -120,7 +126,7 @@ def preload_Assets():
 	count = 0
 	for r,d,f in os.walk('snd'):
 		for file in os.listdir(r):
-				if file.endswith(".wav"):
+				if file.endswith(".wav") or file.endswith(".mp3"):
 					count+=1
 					preloadedAssets.append([os.path.join(r,file), SoundLoader.load(os.path.join(r,file))])
 	if count == 1:
@@ -237,6 +243,7 @@ class MainLayout(FloatLayout):
 		self.add_widget(BottomStatusBar())
 		self.LeftNavigation()
 		self.Page_Welcome()
+		self.PlaySound('datalink.mp3')
 
 	def LeftNavigation(self):
 		self.ButtonCreation_LeftNavigation('welcome', 2, 0, 1, 2)
@@ -311,96 +318,91 @@ class MainLayout(FloatLayout):
 		btn_txt = Label(text=btnText, pos=(btn.pos[0]+2,btn.pos[1]-5), size=(50,13), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', color=(0,0,0,1), id='btnLeftNavigation')
 		btn_txt.bind(texture_size=btn_txt.setter('size'))
 
-		if btnClickSounds != 0 and config_clicksounds != 0:
-			btn.bind(on_press=self.PlayRndSound)
-			btn_txt.bind(on_press=self.PlayRndSound)
+		elements = [btn,btn_txt]
+		for x in elements:
+			x.bind(on_press=self.EnumFunctions(self, btnEnumFunction))
+			if config_clicksounds == 1:
+				x.bind(on_press=self.PlayClickSound)
+			self.add_widget(x)
 
-		if btnEnumFunction != None:
-			btn.bind(on_press=self.EnumFunctions(self, btnEnumFunction))
-			btn_txt.bind(on_press=self.EnumFunctions(self, btnEnumFunction))
-
-		self.add_widget(btn)
-		self.add_widget(btn_txt)
-
-	def RoundedButton(self, id, leftimage, rightimage, labeltext, action, position, width, textsize='48sp', backgroundColor=(0.71,0,0.02,1), foregroundColor=(1,1,1,1), clickSound=True, soundFile=None):
-		btn_left = MyImageButton(texture=returnPreloadedAsset(leftimage), pos=position, size_hint=(None,None), size=(23,46), id=id)
-		self.add_widget(btn_left)
-		btn_right = MyImageButton(texture=returnPreloadedAsset(rightimage), pos=(position[0]+19+width, position[1]), size_hint=(None,None), size=(23,46), id=id)
-		self.add_widget(btn_right)
+	def RoundedButton(self, id, images, labeltext, action, position, width, textsize='48sp', backgroundColor=(0.71,0,0.02,1), foregroundColor=(1,1,1,1), clickSound=True, soundFile=None):
+		btn_left = MyImageButton(texture=returnPreloadedAsset(images[0]), pos=position, size_hint=(None,None), size=(23,46), id=id)
+		btn_right = MyImageButton(texture=returnPreloadedAsset(images[1]), pos=(position[0]+19+width, position[1]), size_hint=(None,None), size=(23,46), id=id)
 		btn_center = MyButton(pos=(position[0]+21,position[1]+1), size=(width,45), size_hint=(None,None), id=id)
 		with btn_center.canvas.before:
 			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
 			Rectangle(pos=btn_center.pos, size=btn_center.size)
-		self.add_widget(btn_center)
 		btn_lbl = MyButton(text=labeltext, pos=(position[0]+21,position[1]+7), size=(width,31), size_hint=(None,None), color=(foregroundColor[0],foregroundColor[1],foregroundColor[2],foregroundColor[3]), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size=textsize, id=id, halign='center')
-		self.add_widget(btn_lbl)
 
-		elements = [btn_lbl,btn_center,btn_right,btn_left]
+		elements = [btn_right,btn_left,btn_center,btn_lbl]
 		for x in elements:
 			x.bind(on_press=action)
 			if clickSound and config_clicksounds == 1 and soundFile == None:
-				x.bind(on_press=self.PlayRndSound)
+				x.bind(on_press=self.PlayClickSound)
 			if soundFile != None:
 				x.bind(on_press=lambda a:self.PlaySound(soundFile))
+			self.add_widget(x)
 
 	def RoundedButtonSquare(self, id, cornerImages, labeltext, action, position, width, height, iconImage, textsize='48sp', backgroundColor=(0.71,0,0.02,1), foregroundColor=(0,0,0,1), clickSound=True, soundFile=None):
 		width = width-64
 		height = height-32
 		btn_upLeft = MyImageButton(texture=returnPreloadedAsset(cornerImages[0]), pos=(position[0],position[1]+height), size_hint=(None,None), size=(32,32), id=id)
-		self.add_widget(btn_upLeft)
 		btn_upRight = MyImageButton(texture=returnPreloadedAsset(cornerImages[1]), pos=(position[0]+width+33,position[1]+height), size_hint=(None,None), size=(32,32), id=id)
-		self.add_widget(btn_upRight)
 		btn_downLeft = MyImageButton(texture=returnPreloadedAsset(cornerImages[2]), pos=(position[0],position[1]), size_hint=(None,None), size=(32,32), id=id)
-		self.add_widget(btn_downLeft)
 		btn_downRight = MyImageButton(texture=returnPreloadedAsset(cornerImages[3]), pos=(position[0]+width+33,position[1]-1), size_hint=(None,None), size=(32,32), id=id)
-		self.add_widget(btn_downRight)
 
 		btn_upCenter = MyButton(pos=(position[0]+32,position[1]+height), size=(width+2,32), size_hint=(None,None), id=id)
 		with btn_upCenter.canvas.before:
 			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
 			Rectangle(pos=btn_upCenter.pos, size=btn_upCenter.size)
-		self.add_widget(btn_upCenter)
 		btn_downCenter = MyButton(pos=(position[0]+32,position[1]), size=(width+2,32), size_hint=(None,None), id=id)
 		with btn_downCenter.canvas.before:
 			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
 			Rectangle(pos=btn_downCenter.pos, size=btn_downCenter.size)
-		self.add_widget(btn_downCenter)
 
 		btn_leftCenter = MyButton(pos=(position[0],position[1]+31), size=(32,(height-31)), size_hint=(None,None), id=id)
 		with btn_leftCenter.canvas.before:
 			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
 			Rectangle(pos=btn_leftCenter.pos, size=btn_leftCenter.size)
-		self.add_widget(btn_leftCenter)
 		btn_rightCenter = MyButton(pos=(position[0]+width+32,position[1]+30), size=(32,(height-30)), size_hint=(None,None), id=id)
 		with btn_rightCenter.canvas.before:
 			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
 			Rectangle(pos=btn_rightCenter.pos, size=btn_rightCenter.size)
-		self.add_widget(btn_rightCenter)
 
 		btn_Center = MyButton(pos=(position[0]+32,position[1]+32), size=(width,(height-32)), size_hint=(None,None), id=id)
 		with btn_Center.canvas.before:
 			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
 			Rectangle(pos=btn_Center.pos, size=btn_Center.size)
-		self.add_widget(btn_Center)
 
-		btn_lbl = MyButton(text=labeltext, pos=(position[0],position[1]+14), size=(width+64,32), size_hint=(None,None), color=(foregroundColor[0],foregroundColor[1],foregroundColor[2],foregroundColor[3]), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size=textsize, id=id, halign='center')
-		self.add_widget(btn_lbl)
+		btn_lbl = MyButton(text=labeltext, pos=(position[0],position[1]+12), size=(width+64,32), size_hint=(None,None), color=(foregroundColor[0],foregroundColor[1],foregroundColor[2],foregroundColor[3]), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size=textsize, id=id, halign='center')
 
-		btn_icon = MyImageButton(texture=returnPreloadedAsset(iconImage), pos=(position[0]+((width+64)/2),position[1]+(((height+32)/100)*30)), size=(width+(((width+64)/100)*15),height-(((height+32)/100)*14)), size_hint=(None,None), id=id)
+		btn_icon = MyImageButton(texture=returnPreloadedAsset(iconImage), pos=(position[0]+((width+64)/2),position[1]+(((height+32)/100)*30)), size=(width+(((width+64)/100)*15), height-(((height+32)/100)*15)), size_hint=(None,None), id=id)
 		btn_icon.pos=(btn_icon.pos[0]-(btn_icon.size[0]/2),btn_icon.pos[1])
-		with btn_icon.canvas.before:
-			Color(1,0.5,0.5,1)
-			Rectangle(pos=btn_icon.pos, size=btn_icon.size)
-		self.add_widget(btn_icon)
 
-		elements = [btn_icon,btn_lbl,btn_Center,btn_rightCenter,btn_leftCenter,btn_downCenter,btn_upCenter,btn_downRight,btn_downLeft,btn_upLeft,btn_upRight]
+		elements = [btn_downRight,btn_downLeft,btn_upLeft,btn_upRight,btn_Center,btn_rightCenter,btn_leftCenter,btn_downCenter,btn_upCenter,btn_lbl,btn_icon]
 		for x in elements:
 			x.bind(on_press=action)
 			if clickSound and config_clicksounds == 1 and soundFile == None:
-				x.bind(on_press=self.PlayRndSound)
+				x.bind(on_press=self.PlayClickSound)
 			if soundFile != None:
 				x.bind(on_press=lambda a:self.PlaySound(soundFile))
+			self.add_widget(x)
 
+	def RectangleButton(self, id, labeltext, action, position, width, iconImage=None, textsize='36sp', backgroundColor=(1,1,0,1), foregroundColor=(0,0,0,1), clickSound=True, soundFile=None):
+		btn = MyButton(pos=(position[0],position[1]), size=(width,46), size_hint=(None,None), id=id)
+		with btn.canvas.before:
+			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
+			Rectangle(pos=btn.pos, size=btn.size)
+		btn_txt = Label(text=labeltext, pos=(position[0],position[1]), size=(width,44), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size=textsize, color=foregroundColor, markup=True, id=id, halign='center')
+
+		elements = [btn, btn_txt]
+		for x in elements:
+			x.bind(on_press=action)
+			if clickSound and config_clicksounds == 1 and soundFile == None:
+				x.bind(on_press=self.PlayClickSound)
+			if soundFile != None:
+				x.bind(on_press=lambda a:self.PlaySound(soundFile))
+			self.add_widget(x)
 
 #endregion
 
@@ -419,7 +421,7 @@ class MainLayout(FloatLayout):
 	def exit_page1(self, instance):
 		self.remove_mywidget('Exit_auth')
 		id='Exit'
-		self.RoundedButton(id + '_auth','btn_red_rounded_left.png', 'btn_red_rounded_right.png', '--- CONFIRM ---', self.exit_page2, (328,81), 197, '42sp', soundFile='complete.wav')
+		self.RoundedButton(id + '_auth',('btn_red_rounded_left.png', 'btn_red_rounded_right.png'), '--- CONFIRM ---', self.exit_page2, (328,81), 197, '42sp', soundFile='complete.wav')
 		Logger.info('PageFunction : Pageswitch - Exit 1')
 
 	def exit_page2(self, instance):
@@ -443,7 +445,7 @@ class MainLayout(FloatLayout):
 		id='Exit'
 		lbl_shutdown = Label(text='COMPUTER CORE\nSHUTDOWN', pos=(282,256), size=(325,152), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='96sp', id=id, halign='center')
 		self.add_widget(lbl_shutdown)
-		self.RoundedButton(id + '_auth','btn_red_rounded_left.png', 'btn_red_rounded_right.png', '--- AUTHORIZE ---', self.exit_page1, (239,167), 370, soundFile='beep.wav')
+		self.RoundedButton(id + '_auth',('btn_red_rounded_left.png', 'btn_red_rounded_right.png'), '--- AUTHORIZE ---', self.exit_page1, (239,167), 370, soundFile='beep.wav')
 
 	def Page_Welcome(self):
 		id='Welcome'
@@ -458,61 +460,12 @@ class MainLayout(FloatLayout):
 
 	def Page_ElitePIPS(self):
 		id='ElitePIPS'
-		#button reset
-		btn0 = MyButton(pos=(328,117), size=(233,46), size_hint=(None,None), id=id)
-		with btn0.canvas.before:
-			Color(1,1,0,1)
-			Rectangle(pos=btn0.pos, size=btn0.size)
-		btn0_txt = Label(text='[b]RESET[/b]', pos=(328,117), size=(233,46), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', color=(0,0,0,1), markup=True, id=id)
+		
+		self.RectangleButton(id, 'engines', self.btn_speed, (328,319),233)
+		self.RectangleButton(id, 'weapons', self.btn_weapons, (511,211),233)
+		self.RectangleButton(id, 'reset', self.btn_reset, (328,117),233)
+		self.RectangleButton(id, 'system', self.btn_system, (142,211),233)
 
-		btn0.bind(on_press=self.btn_reset)
-		btn0.bind(on_press=self.PlayRndSound)
-		btn0_txt.bind(on_press=self.btn_reset)
-
-		self.add_widget(btn0)
-		self.add_widget(btn0_txt)
-
-		#button SYSTEM
-		btn_system = MyButton(pos=(142,216), size=(233,46), size_hint=(None,None), id=id)
-		with btn_system.canvas.before:
-			Color(1,1,0,1)
-			Rectangle(pos=btn_system.pos, size=btn_system.size)
-		btn_system_txt = Label(text='[b]SYSTEM[/b]', pos=(142,216), size=(233,46), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', color=(0,0,0,1), markup=True, id=id)
-
-		btn_system.bind(on_press=self.btn_system)
-		btn_system.bind(on_press=self.PlayRndSound)
-		btn_system_txt.bind(on_press=self.btn_system)
-
-		self.add_widget(btn_system)
-		self.add_widget(btn_system_txt)
-
-		#button WEAPONS
-		btn_weapons = MyButton(pos=(511,221), size=(233,46), size_hint=(None,None), id=id)
-		with btn_weapons.canvas.before:
-			Color(1,1,0,1)
-			Rectangle(pos=btn_weapons.pos, size=btn_weapons.size)
-		btn_weapons_txt = Label(text='[b]WEAPONS[/b]', pos=(511,221), size=(233,46), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', color=(0,0,0,1), markup=True, id=id)
-
-		btn_weapons.bind(on_press=self.btn_weapons)
-		btn_weapons.bind(on_press=self.PlayRndSound)
-		btn_weapons_txt.bind(on_press=self.btn_weapons)
-
-		self.add_widget(btn_weapons)
-		self.add_widget(btn_weapons_txt)
-
-		#button speed
-		btn_speed = MyButton(pos=(328,319), size=(233,46), size_hint=(None,None), id=id)
-		with btn_speed.canvas.before:
-			Color(1,1,0,1)
-			Rectangle(pos=btn_speed.pos, size=btn_speed.size)
-		btn_speed_txt = Label(text='[b]Speed[/b]', pos=(328,319), size=(233,46), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', color=(0,0,0,1), markup=True, id=id)
-
-		btn_speed.bind(on_press=self.btn_speed)
-		btn_speed.bind(on_press=self.PlayRndSound)
-		btn_speed_txt.bind(on_press=self.btn_speed)
-
-		self.add_widget(btn_speed)
-		self.add_widget(btn_speed_txt)
 
 	def Page_EliteLimpets(self):
 		id='EliteLimpets'
@@ -524,12 +477,6 @@ class MainLayout(FloatLayout):
 		self.RoundedButtonSquare(id,('btn_lightblue_upLeft.png','btn_lightblue_upRight.png','btn_lightblue_downLeft.png','btn_lightblue_downRight.png'), 'DECON', self.btn_limpets_decon, btn_positions_first_row[0], 150, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 153,205,255))
 		#REPAIR
 		self.RoundedButtonSquare(id,('btn_green_upLeft.png','btn_green_upRight.png','btn_green_downLeft.png','btn_green_downRight.png'), 'REPAIR', self.btn_limpets_repair, btn_positions_second_row[2], 150, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 0,168,89))
-		#test
-		self.RoundedButtonSquare(id,('btn_green_upLeft.png','btn_green_upRight.png','btn_green_downLeft.png','btn_green_downRight.png'), 'test', self.btn_limpets_repair, btn_positions_second_row[0], 100, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 0,168,89))
-		#test
-		self.RoundedButtonSquare(id,('btn_green_upLeft.png','btn_green_upRight.png','btn_green_downLeft.png','btn_green_downRight.png'), 'test', self.btn_limpets_repair, btn_positions_second_row[1], 80, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 0,168,89))
-		#test
-		self.RoundedButtonSquare(id,('btn_green_upLeft.png','btn_green_upRight.png','btn_green_downLeft.png','btn_green_downRight.png'), 'test', self.btn_limpets_repair, btn_positions_second_row[3], 180, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 0,168,89))
 
 #endregion
 
@@ -585,6 +532,14 @@ class MainLayout(FloatLayout):
 				rndlist.append(x[0])
 		rndint = random.randint(0,count-1)
 		returnPreloadedAsset(rndlist[rndint]).play()
+
+	def PlayClickSound(self, instance):
+		x = returnPreloadedAsset('207.wav')
+		if x != None:
+			x.seek(0)
+			x.play()
+		else:
+			Logger.error('Sound : File 404')
 
 	def PlaySound(self, soundFileName):
 		x = returnPreloadedAsset(soundFileName)
