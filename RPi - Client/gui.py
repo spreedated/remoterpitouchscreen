@@ -67,6 +67,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.video import Video
 from kivy.core.video import VideoBase
 from kivy.uix.videoplayer import VideoPlayer
+from mod.StatusBars import *
 
 if sys.version_info[0] != 3:
 	print("This script requires Python version 3.x")
@@ -140,76 +141,6 @@ def returnPreloadedAsset(AssetName):
 			return x[1]
 #endregion
 
-#region TopStatusBar
-class TopStatusBar(FloatLayout):
-	lbl_dot = ObjectProperty()
-	lbl_time = ObjectProperty()
-
-	def __init__(self, lblText='neXn-Systems', **kwargs):
-		super().__init__(**kwargs)
-		#BlackBox behind
-		maincnv = Label(pos=(457,445), size=(315,25), size_hint=(None,None))
-		with maincnv.canvas.before:
-			Color(0,0,0,1)
-			Rectangle(pos=maincnv.pos, size=maincnv.size)
-
-		lbl_box = Label(text=lblText, pos=(459,440), size=(225,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='28sp')
-		lbl_box.bind(texture_size=lbl_box.setter('size'))
-		self.lbl_dot = Label(text='', pos=(690,445), size=(5,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='28sp')
-		self.lbl_time = Label(text='', pos=(705,445), size=(60,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='28sp')
-
-		self.add_widget(maincnv)
-		self.add_widget(lbl_box)
-		self.add_widget(self.lbl_dot)
-		self.add_widget(self.lbl_time)
-		self.flash(None)
-
-	def flash(self, instance):
-		Clock.schedule_interval(self.timer, 0.8)
-		Clock.schedule_interval(self.timerTime, 0.1)
-
-	def timer(self, instance):
-		acc = self.lbl_dot.text
-		if acc == '':
-			self.lbl_dot.text = '•'
-		else:
-			self.lbl_dot.text = ''
-
-	def timerTime(self, instance):
-		now = datetime.datetime.now()
-		self.lbl_time.text = now.strftime('%H:%M:%S')
-#endregion
-
-#region BottomStatusBar
-class BottomStatusBar(FloatLayout):
-	lbl_date = ObjectProperty()
-
-	def __init__(self, **kwargs):
-		super().__init__(**kwargs)
-		#BlackBox behind
-		maincnv = Label(pos=(206,10), size=(148,25), size_hint=(None,None))
-		with maincnv.canvas.before:
-			Color(0,0,0,1)
-			Rectangle(pos=maincnv.pos, size=maincnv.size)
-		self.add_widget(maincnv)
-
-		lbl_box = Label(text='stardate:', pos=(212,8), size=(70,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='24sp')
-		lbl_box.bind(texture_size=lbl_box.setter('size'))
-		self.add_widget(lbl_box)
-
-		rndint = random.randint(10000,99999)
-		self.lbl_date = Label(text=str(rndint) + '.00', pos=(289,8), size=(100,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='24sp')
-		self.lbl_date.bind(texture_size=self.lbl_date.setter('size'))
-		self.add_widget(self.lbl_date)
-
-		self.timerDate(None)
-		Clock.schedule_interval(self.timerDate, 45)
-
-	def timerDate(self, instance):
-		rndint = random.randint(00,99)
-		self.lbl_date.text = self.lbl_date.text[:self.lbl_date.text.find('.')+1] + str("{:02d}".format(rndint))
-#endregion
-
 class ColorConversion():
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
@@ -232,6 +163,8 @@ class MyImageButton(ButtonBehavior, Image):
 		pass
 
 class MainLayout(FloatLayout):
+
+	classElements = [TopStatusBar(), BottomStatusBar()]
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		bg = Image(texture=returnPreloadedAsset('bg.png'), pos=(1,0), size_hint=(None,None), size=(800,480), id='background')
@@ -239,11 +172,13 @@ class MainLayout(FloatLayout):
 		txt_menu = Label(text='MENU', pos=(42,435), size=(35,18), size_hint=(None,None), color=(0,0,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='28 sp')
 		self.add_widget(txt_menu)
 
-		self.add_widget(TopStatusBar())
-		self.add_widget(BottomStatusBar())
+		for element in self.classElements:
+			self.add_widget(element)
+		#self.add_widget(TopStatusBar())
+		#self.add_widget(BottomStatusBar())
 		self.LeftNavigation()
 		self.Page_Welcome()
-		self.PlaySound('datalink.mp3')
+		#self.PlaySound('datalink.mp3')
 
 	def LeftNavigation(self):
 		self.ButtonCreation_LeftNavigation('welcome', 2, 0, 1, 2)
@@ -278,12 +213,26 @@ class MainLayout(FloatLayout):
 							self.remove_widget(child)
 		Logger.info('PageFunction : Pages cleared')
 
-	def remove_mywidget(self, widget_id):
+	def remove_mywidget(self, widget_id, className=None):
 		for x in range(5):
-			for child in self.children:
-				if child.id != None:
-					if widget_id in child.id:
-						self.remove_widget(child)
+			if className == None:
+				for child in self.children:
+					if child.id != None:
+						if widget_id in child.id:
+							if type(child) == Video:
+								child.unload()
+							if type(child) == VideoPlayer:
+								child.state = 'stop'
+							self.remove_widget(child)
+			else:
+				for child in className.children:
+					if child.id != None:
+						if widget_id in child.id:
+							if type(child) == Video:
+								child.unload()
+							if type(child) == VideoPlayer:
+								child.state = 'stop'
+							className.remove_widget(child)
 #endregion
 
 	def EnumPosition(self, instance, enum):
@@ -460,7 +409,7 @@ class MainLayout(FloatLayout):
 
 	def Page_ElitePIPS(self):
 		id='ElitePIPS'
-		
+
 		self.RectangleButton(id, 'engines', self.btn_speed, (328,319),233)
 		self.RectangleButton(id, 'weapons', self.btn_weapons, (511,211),233)
 		self.RectangleButton(id, 'reset', self.btn_reset, (328,117),233)
