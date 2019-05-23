@@ -1,5 +1,6 @@
 import datetime
 import time
+import random
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.properties import StringProperty, ObjectProperty
@@ -8,10 +9,11 @@ from kivy.clock import Clock
 
 #region TopStatusBar
 class TopStatusBar(FloatLayout):
+	lbl_box = ObjectProperty()
 	lbl_dot = ObjectProperty()
 	lbl_time = ObjectProperty()
 
-	def __init__(self, lblText='neXn-Systems', **kwargs):
+	def __init__(self, mainClass, lblText='neXn-Systems', **kwargs):
 		super().__init__(**kwargs)
 		id='TopStatusBar'
 		#BlackBox behind
@@ -20,15 +22,15 @@ class TopStatusBar(FloatLayout):
 			Color(0,0,0,1)
 			Rectangle(pos=maincnv.pos, size=maincnv.size)
 
-		lbl_box = Label(text=lblText, pos=(459,440), size=(225,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='28sp', id=id)
-		lbl_box.bind(texture_size=lbl_box.setter('size'))
+		self.lbl_box = Label(text=lblText, pos=(459,440), size=(225,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='28sp', id=id)
+		self.lbl_box.bind(texture_size=self.lbl_box.setter('size'))
 		self.lbl_dot = Label(text='', pos=(690,445), size=(5,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='28sp', id=id)
 		self.lbl_time = Label(text='', pos=(705,445), size=(60,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='28sp', id=id)
 
-		self.add_widget(maincnv)
-		self.add_widget(lbl_box)
-		self.add_widget(self.lbl_dot)
-		self.add_widget(self.lbl_time)
+		mainClass.add_widget(maincnv)
+		mainClass.add_widget(self.lbl_box)
+		mainClass.add_widget(self.lbl_dot)
+		mainClass.add_widget(self.lbl_time)
 		self.flash(None)
 
 	def flash(self, instance):
@@ -45,13 +47,16 @@ class TopStatusBar(FloatLayout):
 	def timerTime(self, instance):
 		now = datetime.datetime.now()
 		self.lbl_time.text = now.strftime('%H:%M:%S')
+
+	def changeCaption(self, caption):
+		self.lbl_box.text = caption
 #endregion
 
 #region BottomStatusBar
 class BottomStatusBar(FloatLayout):
 	lbl_date = ObjectProperty()
 
-	def __init__(self, **kwargs):
+	def __init__(self, mainClass, **kwargs):
 		super().__init__(**kwargs)
 		id='BottomStatusBar'
 		#BlackBox behind
@@ -59,7 +64,7 @@ class BottomStatusBar(FloatLayout):
 		with maincnv.canvas.before:
 			Color(0,0,0,1)
 			Rectangle(pos=maincnv.pos, size=maincnv.size)
-		self.add_widget(maincnv)
+		mainClass.add_widget(maincnv)
 
 		lbl_box = Label(text='stardate:', pos=(212,8), size=(70,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', id=id)
 		lbl_box.bind(texture_size=lbl_box.setter('size'))
@@ -68,7 +73,7 @@ class BottomStatusBar(FloatLayout):
 		rndint = random.randint(10000,99999)
 		self.lbl_date = Label(text=str(rndint) + '.00', pos=(289,8), size=(100,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', id=id)
 		self.lbl_date.bind(texture_size=self.lbl_date.setter('size'))
-		self.add_widget(self.lbl_date)
+		mainClass.add_widget(self.lbl_date)
 
 		self.timerDate(None)
 		Clock.schedule_interval(self.timerDate, 45)
