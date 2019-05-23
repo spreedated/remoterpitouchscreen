@@ -68,12 +68,14 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.video import Video
 from kivy.core.video import VideoBase
 from kivy.uix.videoplayer import VideoPlayer
+from kivy.uix.scrollview import ScrollView
 from mod.Color import ColorConversion
 from mod.StatusBars import *
 from mod.Inara_Ships import Ships
 from mod.Configuration import Configuration
 from mod.Preload import PreloadAssets
-from mod.Buttons import *
+from mod.Sound import Sounds
+from mod.Controls import *
 from mod.RemovesClears import RemovesClears
 
 if sys.version_info[0] != 3:
@@ -103,136 +105,15 @@ class MainLayout(FloatLayout):
 
 		self.LeftNavigation()
 		self.Page_Welcome()
-		#self.PlaySound('datalink.mp3')
+		#Sounds.PlaySound(Preload_LCARS, 'datalink.mp3')
 
 	def LeftNavigation(self):
-		
-		self.Button_LeftNav('debug', 0, 2, 1, self.btn_test)
-		self.Button_LeftNav('inara', 1, 2, 1, self.page_inara)
-		self.Button_LeftNav('welcome', 2, 0, 1, self.welcome_page)
-		self.Button_LeftNav('elite limpets', 4, 1, 1, self.elitedangerous_limpets)
-		self.Button_LeftNav('elite pips', 5, 0, 1, self.elitedangerous_pips)
-		self.Button_LeftNav('exit', 7, 2, 1, self.exit_page)
-
-	def EnumPosition(self, instance, enum):
-		if enum == 0:
-			return (11,383)
-		if enum == 1:
-			return (11,336)
-		if enum == 2:
-			return (11,290)
-		if enum == 3:
-			return (11,243)
-		if enum == 4:
-			return (11,196)
-		if enum == 5:
-			return (11,150)
-		if enum == 6:
-			return (11,103)
-		if enum == 7:
-			return (11,56)
-
-#region Buttons
-	def Button_LeftNav(self, btnText, btnEnumPosition, btnEnumColor, btnClickSounds=0, action=None):
-		btn = MyButton(pos=self.EnumPosition(self, btnEnumPosition), size=(96,40), size_hint=(None,None), id='btnLeftNavigation')
-		with btn.canvas.before:
-			if btnEnumColor == 0: #Yellow
-				Color(1,1,0.2,1)
-			if btnEnumColor == 1: #Light yellow
-				Color(0.95,0.99,0.44,1)
-			if btnEnumColor == 2: #Blue
-				Color(0.6,0.8,1,1)
-			Rectangle(pos=btn.pos, size=btn.size)
-		btn_txt = Label(text=btnText, pos=(btn.pos[0]+2,btn.pos[1]-5), size=(50,13), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', color=(0,0,0,1), id='btnLeftNavigation')
-		btn_txt.bind(texture_size=btn_txt.setter('size'))
-
-		elements = [btn,btn_txt]
-		for x in elements:
-			x.bind(on_press=action)
-			if Config_LCARS.clicksounds == 1:
-				x.bind(on_press=self.PlayClickSound)
-			self.add_widget(x)
-
-	def RoundedButton(self, id, images, labeltext, action, position, width, textsize='48sp', backgroundColor=(0.71,0,0.02,1), foregroundColor=(1,1,1,1), clickSound=True, soundFile=None):
-		btn_left = MyImageButton(texture=Preload_LCARS.returnPreloadedAsset(images[0]), pos=position, size_hint=(None,None), size=(23,46), id=id)
-		btn_right = MyImageButton(texture=Preload_LCARS.returnPreloadedAsset(images[1]), pos=(position[0]+19+width, position[1]), size_hint=(None,None), size=(23,46), id=id)
-		btn_center = MyButton(pos=(position[0]+21,position[1]+1), size=(width,45), size_hint=(None,None), id=id)
-		with btn_center.canvas.before:
-			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
-			Rectangle(pos=btn_center.pos, size=btn_center.size)
-		btn_lbl = MyButton(text=labeltext, pos=(position[0]+21,position[1]+7), size=(width,31), size_hint=(None,None), color=(foregroundColor[0],foregroundColor[1],foregroundColor[2],foregroundColor[3]), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size=textsize, id=id, halign='center')
-
-		elements = [btn_right,btn_left,btn_center,btn_lbl]
-		for x in elements:
-			x.bind(on_press=action)
-			if clickSound and Config_LCARS.clicksounds == 1 and soundFile == None:
-				x.bind(on_press=self.PlayClickSound)
-			if soundFile != None:
-				x.bind(on_press=lambda a:self.PlaySound(soundFile))
-			self.add_widget(x)
-
-	def RoundedButtonSquare(self, id, cornerImages, labeltext, action, position, width, height, iconImage, textsize='48sp', backgroundColor=(0.71,0,0.02,1), foregroundColor=(0,0,0,1), clickSound=True, soundFile=None):
-		width = width-64
-		height = height-32
-		btn_upLeft = MyImageButton(texture=Preload_LCARS.returnPreloadedAsset(cornerImages[0]), pos=(position[0],position[1]+height), size_hint=(None,None), size=(32,32), id=id)
-		btn_upRight = MyImageButton(texture=Preload_LCARS.returnPreloadedAsset(cornerImages[1]), pos=(position[0]+width+33,position[1]+height), size_hint=(None,None), size=(32,32), id=id)
-		btn_downLeft = MyImageButton(texture=Preload_LCARS.returnPreloadedAsset(cornerImages[2]), pos=(position[0],position[1]), size_hint=(None,None), size=(32,32), id=id)
-		btn_downRight = MyImageButton(texture=Preload_LCARS.returnPreloadedAsset(cornerImages[3]), pos=(position[0]+width+33,position[1]-1), size_hint=(None,None), size=(32,32), id=id)
-
-		btn_upCenter = MyButton(pos=(position[0]+32,position[1]+height), size=(width+2,32), size_hint=(None,None), id=id)
-		with btn_upCenter.canvas.before:
-			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
-			Rectangle(pos=btn_upCenter.pos, size=btn_upCenter.size)
-		btn_downCenter = MyButton(pos=(position[0]+32,position[1]), size=(width+2,32), size_hint=(None,None), id=id)
-		with btn_downCenter.canvas.before:
-			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
-			Rectangle(pos=btn_downCenter.pos, size=btn_downCenter.size)
-
-		btn_leftCenter = MyButton(pos=(position[0],position[1]+31), size=(32,(height-31)), size_hint=(None,None), id=id)
-		with btn_leftCenter.canvas.before:
-			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
-			Rectangle(pos=btn_leftCenter.pos, size=btn_leftCenter.size)
-		btn_rightCenter = MyButton(pos=(position[0]+width+32,position[1]+30), size=(32,(height-30)), size_hint=(None,None), id=id)
-		with btn_rightCenter.canvas.before:
-			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
-			Rectangle(pos=btn_rightCenter.pos, size=btn_rightCenter.size)
-
-		btn_Center = MyButton(pos=(position[0]+32,position[1]+32), size=(width,(height-32)), size_hint=(None,None), id=id)
-		with btn_Center.canvas.before:
-			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
-			Rectangle(pos=btn_Center.pos, size=btn_Center.size)
-
-		btn_lbl = MyButton(text=labeltext, pos=(position[0],position[1]+12), size=(width+64,32), size_hint=(None,None), color=(foregroundColor[0],foregroundColor[1],foregroundColor[2],foregroundColor[3]), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size=textsize, id=id, halign='center')
-
-		btn_icon = MyImageButton(texture=Preload_LCARS.returnPreloadedAsset(iconImage), pos=(position[0]+((width+64)/2),position[1]+(((height+32)/100)*30)), size=(width+(((width+64)/100)*15), height-(((height+32)/100)*15)), size_hint=(None,None), id=id)
-		btn_icon.pos=(btn_icon.pos[0]-(btn_icon.size[0]/2),btn_icon.pos[1])
-
-		elements = [btn_downRight,btn_downLeft,btn_upLeft,btn_upRight,btn_Center,btn_rightCenter,btn_leftCenter,btn_downCenter,btn_upCenter,btn_lbl,btn_icon]
-		for x in elements:
-			x.bind(on_press=action)
-			if clickSound and Config_LCARS.clicksounds == 1 and soundFile == None:
-				x.bind(on_press=self.PlayClickSound)
-			if soundFile != None:
-				x.bind(on_press=lambda a:self.PlaySound(soundFile))
-			self.add_widget(x)
-
-	def RectangleButton(self, id, labeltext, action, position, width, iconImage=None, textsize='36sp', backgroundColor=(1,1,0,1), foregroundColor=(0,0,0,1), clickSound=True, soundFile=None):
-		btn = MyButton(pos=(position[0],position[1]), size=(width,46), size_hint=(None,None), id=id)
-		with btn.canvas.before:
-			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
-			Rectangle(pos=btn.pos, size=btn.size)
-		btn_txt = Label(text=labeltext, pos=(position[0],position[1]), size=(width,44), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size=textsize, color=foregroundColor, markup=True, id=id, halign='center')
-
-		elements = [btn, btn_txt]
-		for x in elements:
-			x.bind(on_press=action)
-			if clickSound and Config_LCARS.clicksounds == 1 and soundFile == None:
-				x.bind(on_press=self.PlayClickSound)
-			if soundFile != None:
-				x.bind(on_press=lambda a:self.PlaySound(soundFile))
-			self.add_widget(x)
-
-#endregion
+		Buttons.Button_LeftNav(self, Config_LCARS, Preload_LCARS, 'debug', 0, 2, 1, self.btn_test)
+		Buttons.Button_LeftNav(self, Config_LCARS, Preload_LCARS, 'inara', 1, 2, 1, self.page_inara)
+		Buttons.Button_LeftNav(self, Config_LCARS, Preload_LCARS, 'welcome', 2, 0, 1, self.welcome_page)
+		Buttons.Button_LeftNav(self, Config_LCARS, Preload_LCARS, 'elite limpets', 4, 1, 1, self.elitedangerous_limpets)
+		Buttons.Button_LeftNav(self, Config_LCARS, Preload_LCARS, 'elite pips', 5, 0, 1, self.elitedangerous_pips)
+		Buttons.Button_LeftNav(self, Config_LCARS, Preload_LCARS, 'exit', 7, 2, 1, self.exit_page)
 
 	Pages = ['Welcome','ElitePIPS', 'EliteLimpets', 'Exit', 'inara']
 
@@ -252,7 +133,7 @@ class MainLayout(FloatLayout):
 	def exit_page1(self, instance):
 		RemovesClears.remove_mywidget(self, 'Exit_auth')
 		id='Exit'
-		self.RoundedButton(id + '_auth',('btn_red_rounded_left.png', 'btn_red_rounded_right.png'), '--- CONFIRM ---', self.exit_page2, (328,81), 197, '42sp', soundFile='complete.wav')
+		Buttons.RoundedButton(self, Config_LCARS, Preload_LCARS, id + '_auth',('btn_red_rounded_left.png', 'btn_red_rounded_right.png'), '--- CONFIRM ---', self.exit_page2, (328,81), 197, '42sp', soundFile='complete.wav')
 		Logger.info('PageFunction : Pageswitch - Exit 1')
 
 	def exit_page2(self, instance):
@@ -286,29 +167,40 @@ class MainLayout(FloatLayout):
 			self.shipinstance = Ships(Config_LCARS)
 		RemovesClears.remove_mywidget(self, 'inaracz')
 
-		status = ''
-		if self.shipinstance.status == False:
-			status = 'Something went wrong'
+		
+		if self.shipinstance.status != None:
+			status = self.shipinstance.status
 		else:
 			status = 'Loaded'
 
 		lbl_info = Label(text=status, pos=(282,256), size=(325,152), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='96sp', id=id, halign='center')
 		self.add_widget(lbl_info)
 
-		return
+		
 
 	def Page_inaracz(self):
 		id='inaracz'
 		lbl_info = Label(text='Loading...', pos=(282,256), size=(325,152), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='96sp', id=id, halign='center')
 		self.add_widget(lbl_info)
 
-		threading.Thread(target=self.initinThread).start()
+		#threading.Thread(target=self.initinThread).start()
+
+		#lbl_test = ScrollView(text='dasdasdsadsadsa\nfdsfdsfdsfdsfds\ndsfdsfdsfsafs33\n\n\n\nasd2d2', pos=(282,128), size=(325,152), size_hint=(None,None), id=id, font_name='fnt/lcarsgtj3.ttf', font_size='96sp')
+		lbl_test = ScrollView(pos=(282,128), size=(325,152), size_hint=(None,None), id=id, bar_width=4, do_scroll_y=True, do_scroll_x=True)
+		#with lbl_test.canvas.before:
+		#	Color(1,0.5,0.9,1)
+		#	Rectangle(pos=lbl_test.pos, size=lbl_test.size)
+		
+		lbl_info2 = Label(text='Loading...\nfdfds\nfdsfdsgfdgfdgfdgfdddg3333', pos=(0,0), size=(500,500), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='96sp', id=id, halign='center')
+		lbl_test.add_widget(lbl_info2)
+
+		self.add_widget(lbl_test)
 		
 	def Page_Exit(self):
 		id='Exit'
 		lbl_shutdown = Label(text='COMPUTER CORE\nSHUTDOWN', pos=(282,256), size=(325,152), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='96sp', id=id, halign='center')
 		self.add_widget(lbl_shutdown)
-		self.RoundedButton(id + '_auth',('btn_red_rounded_left.png', 'btn_red_rounded_right.png'), '--- AUTHORIZE ---', self.exit_page1, (239,167), 370, soundFile='beep.wav')
+		Buttons.RoundedButton(self, Config_LCARS, Preload_LCARS, id + '_auth',('btn_red_rounded_left.png', 'btn_red_rounded_right.png'), '--- AUTHORIZE ---', self.exit_page1, (239,167), 370, soundFile='beep.wav')
 
 	def Page_Welcome(self):
 		id='Welcome'
@@ -324,16 +216,16 @@ class MainLayout(FloatLayout):
 	def Page_ElitePIPS(self):
 		id='ElitePIPS'
 
-		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'engines', self.btn_speed, (118,371),233)
-		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'weapons', self.btn_weapons, (118,313),233)
-		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'system', self.btn_system, (118,256),233)
-		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'reset', self.btn_reset, (118,198),233)
+		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'engines', self.btn_speed, (118,371),233)
+		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'weapons', self.btn_weapons, (118,313),233)
+		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'system', self.btn_system, (118,256),233)
+		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'reset', self.btn_reset, (118,198),233)
 
-		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'Combat turn', self.btn_combatturn, (538,340),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 153,205,255), soundFile='man_combatturn.wav')
-		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'Alpha Strike', self.btn_alphastrike, (494,255),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 181,0,6), soundFile='man_alphastrike.wav')
-		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'Head to Head', self.btn_headtohead, (494,170),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 181,0,6), soundFile='man_headtohead.wav')
-		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'Omega one', self.btn_omegaone, (185,85),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 0,168,89), soundFile='man_omegaone.wav')
-		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'Omega two', self.btn_omegatwo, (471,85),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 0,168,89), soundFile='man_omegatwo.wav')
+		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'Combat turn', self.btn_combatturn, (538,340),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 153,205,255), soundFile='man_combatturn.wav')
+		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'Alpha Strike', self.btn_alphastrike, (494,255),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 181,0,6), soundFile='man_alphastrike.wav')
+		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'Head to Head', self.btn_headtohead, (494,170),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 181,0,6), soundFile='man_headtohead.wav')
+		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'Omega one', self.btn_omegaone, (185,85),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 0,168,89), soundFile='man_omegaone.wav')
+		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'Omega two', self.btn_omegatwo, (471,85),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 0,168,89), soundFile='man_omegatwo.wav')
 
 
 	def Page_EliteLimpets(self):
@@ -341,11 +233,11 @@ class MainLayout(FloatLayout):
 		btn_positions_first_row=[(124,251),(289,251),(453,251),(618,251)]
 		btn_positions_second_row=[(124,49),(289,49),(453,49),(618,49)]
 		#COLLECTOR
-		self.RoundedButtonSquare(id,('btn_orange_upLeft.png','btn_orange_upRight.png','btn_orange_downLeft.png','btn_orange_downRight.png'), 'COLLECTOR', self.btn_limpets_collector, btn_positions_first_row[3], 150, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 254,154,0))
+		Buttons.RoundedButtonSquare(self, Config_LCARS, Preload_LCARS, id,('btn_orange_upLeft.png','btn_orange_upRight.png','btn_orange_downLeft.png','btn_orange_downRight.png'), 'COLLECTOR', self.btn_limpets_collector, btn_positions_first_row[3], 150, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 254,154,0))
 		#DECON
-		self.RoundedButtonSquare(id,('btn_lightblue_upLeft.png','btn_lightblue_upRight.png','btn_lightblue_downLeft.png','btn_lightblue_downRight.png'), 'DECON', self.btn_limpets_decon, btn_positions_first_row[0], 150, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 153,205,255))
+		Buttons.RoundedButtonSquare(self, Config_LCARS, Preload_LCARS, id,('btn_lightblue_upLeft.png','btn_lightblue_upRight.png','btn_lightblue_downLeft.png','btn_lightblue_downRight.png'), 'DECON', self.btn_limpets_decon, btn_positions_first_row[0], 150, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 153,205,255))
 		#REPAIR
-		self.RoundedButtonSquare(id,('btn_green_upLeft.png','btn_green_upRight.png','btn_green_downLeft.png','btn_green_downRight.png'), 'REPAIR', self.btn_limpets_repair, btn_positions_second_row[2], 150, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 0,168,89))
+		Buttons.RoundedButtonSquare(self, Config_LCARS, Preload_LCARS, id,('btn_green_upLeft.png','btn_green_upRight.png','btn_green_downLeft.png','btn_green_downRight.png'), 'REPAIR', self.btn_limpets_repair, btn_positions_second_row[2], 150, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 0,168,89))
 
 #endregion
 
@@ -415,36 +307,6 @@ class MainLayout(FloatLayout):
 		for key in sequence:
 			os.system('python "' + os.getcwd() + '/'+Config_LCARS.socketfile+'" key ' + key)
 			time.sleep(0.1)
-#endregion
-
-#region Sounds
-	#Play RandomSound
-	def PlayRndSound(self, instance):
-		rndlist = []
-		count = 0
-		for x in preloadedAssets:
-			if 'clicks' in x[0]:
-				count+=1
-				rndlist.append(x[0])
-		rndint = random.randint(0,count-1)
-		Preload_LCARS.returnPreloadedAsset(rndlist[rndint]).play()
-
-	def PlayClickSound(self, instance):
-		x = Preload_LCARS.returnPreloadedAsset('207.wav')
-		if x != None:
-			x.seek(0)
-			x.play()
-		else:
-			Logger.error('Sound : File 404')
-
-	def PlaySound(self, soundFileName):
-		x = Preload_LCARS.returnPreloadedAsset(soundFileName)
-		if x != None:
-			x.seek(0)
-			x.play()
-		else:
-			Logger.error('Sound : File 404')
-
 #endregion
 
 class MainApp(App):

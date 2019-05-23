@@ -7,7 +7,7 @@ class Ships():
 	fleetdetails = [] # [0]name - [1]id - [2]type - [3]value_str - [4]value_int - [5]dock - [6]linktodetails
 	fleetcount = 0
 	fleetvalue = 0
-	status = True # If everything went okay
+	status = None # If everything went okay
 
 	def __init__(self, configinstance, *args, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -15,37 +15,46 @@ class Ships():
 		self.Inara_ProcessFleet(self.Inara_GetFleet(configinstance))
 
 	def Inara_GetFleet(self, configinstance):
-		print(configinstance.inara_username)
 		session = self.cas_login(configinstance.inara_username, configinstance.inara_password)
-		res = session.get('https://inara.cz/cmdr-fleet/')
-		
+		if session == 'timeout':
+			return 'timeout'
+		try:
+		    res = session.get('https://inara.cz/cmdr-fleet/', timeout=5)
+		except Exception as e:
+		    return 'timeout'
 		return res.text
 
 	def cas_login(self, username, password, service=''):
-	    # GET parameters - URL we'd like to log into.
-	    params = {'service': service}
-	    LOGIN_URL = 'https://inara.cz/login/'
+		# GET parameters - URL we'd like to log into.
+		params = {'service': service}
+		LOGIN_URL = 'https://inara.cz/login/'
 
-	    # Start session and get login form.
-	    session = requests.session()
-	    login = session.get(LOGIN_URL, params=params)
+		# Start session and get login form.
+		session = requests.session()
+		try:
+			login = session.get(LOGIN_URL, params=params, timeout=5)
+		except Exception as e:
+			return 'timeout'
+		
+		# Get the hidden elements and put them in our form.
+		login_html = lxml.html.fromstring(login.text)
+		hidden_elements = login_html.xpath('//form//input[@type="hidden"]')
+		form = {x.attrib['name']: x.attrib['value'] for x in hidden_elements}
 
-	    # Get the hidden elements and put them in our form.
-	    login_html = lxml.html.fromstring(login.text)
-	    hidden_elements = login_html.xpath('//form//input[@type="hidden"]')
-	    form = {x.attrib['name']: x.attrib['value'] for x in hidden_elements}
+		# "Fill out" the form.
+		form['loginid'] = username
+		form['loginpass'] = password
 
-	    # "Fill out" the form.
-	    form['loginid'] = username
-	    form['loginpass'] = password
-
-	    # Finally, login and return the session.
-	    session.post(LOGIN_URL, data=form, params=params)
-	    return session
+		# Finally, login and return the session.
+		session.post(LOGIN_URL, data=form, params=params)
+		return session
 
 	def Inara_ProcessFleet(self, rawHTML):
 		if 'Guest</a>' in rawHTML:
-			self.status = False
+			self.status = 'No Login'
+			return
+		elif 'timeout' in rawHTML: 
+			self.status = 'Inara Timeout'
 			return
 
 		r = Selector(text=rawHTML).xpath("//div[@class='shipblockcontainer']").extract()
