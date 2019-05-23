@@ -6,7 +6,3 @@ class ColorConversion():
 		A = float("{0:.2f}".format(A/255))
 
 		return (R,G,B,A)
-
-
-
-

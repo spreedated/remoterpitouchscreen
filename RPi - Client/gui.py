@@ -74,6 +74,7 @@ from mod.Inara_Ships import Ships
 from mod.Configuration import Configuration
 from mod.Preload import PreloadAssets
 from mod.Buttons import *
+from mod.RemovesClears import RemovesClears
 
 if sys.version_info[0] != 3:
 	print("This script requires Python version 3.x")
@@ -83,7 +84,6 @@ Config_LCARS = Configuration()
 Preload_LCARS = PreloadAssets()
 
 class MainLayout(FloatLayout):
-
 	shipinstance = None
 	TopStatusBar = None
 	BottomStatusBar = None
@@ -103,52 +103,16 @@ class MainLayout(FloatLayout):
 
 		self.LeftNavigation()
 		self.Page_Welcome()
-		self.PlaySound('datalink.mp3')
+		#self.PlaySound('datalink.mp3')
 
 	def LeftNavigation(self):
 		
-		self.Button_LeftNav('debug', 0, 2, 1, self.elitedangerous_limpets)
+		self.Button_LeftNav('debug', 0, 2, 1, self.btn_test)
 		self.Button_LeftNav('inara', 1, 2, 1, self.page_inara)
 		self.Button_LeftNav('welcome', 2, 0, 1, self.welcome_page)
 		self.Button_LeftNav('elite limpets', 4, 1, 1, self.elitedangerous_limpets)
 		self.Button_LeftNav('elite pips', 5, 0, 1, self.elitedangerous_pips)
 		self.Button_LeftNav('exit', 7, 2, 1, self.exit_page)
-
-#region Removes&Clears
-	def clear_pages(self):
-		for x in range(8):
-			for child in self.children:
-				if child.id != None:
-					for page in self.Pages:
-						if page in child.id:
-							if type(child) == Video:
-								child.unload()
-							if type(child) == VideoPlayer:
-								child.state = 'stop'
-							self.remove_widget(child)
-		Logger.info('PageFunction : Pages cleared')
-
-	def remove_mywidget(self, widget_id, className=None):
-		for x in range(5):
-			if className == None:
-				for child in self.children:
-					if child.id != None:
-						if widget_id in child.id:
-							if type(child) == Video:
-								child.unload()
-							if type(child) == VideoPlayer:
-								child.state = 'stop'
-							self.remove_widget(child)
-			else:
-				for child in className.children:
-					if child.id != None:
-						if widget_id in child.id:
-							if type(child) == Video:
-								child.unload()
-							if type(child) == VideoPlayer:
-								child.state = 'stop'
-							className.remove_widget(child)
-#endregion
 
 	def EnumPosition(self, instance, enum):
 		if enum == 0:
@@ -274,42 +238,42 @@ class MainLayout(FloatLayout):
 
 #region Pages Switches
 	def welcome_page(self, instance):
-		self.clear_pages()
+		RemovesClears.clear_pages(self)
 		self.Page_Welcome()
 		TopStatusBar.changeCaption(self.TopStatusBar, 'Elite LCARS')
 		Logger.info('PageFunction : Pageswitch - Welcome')
 
 	def exit_page(self, instance):
-		self.clear_pages()
+		RemovesClears.clear_pages(self)
 		TopStatusBar.changeCaption(self.TopStatusBar, 'shutdown')
 		self.Page_Exit()
 		Logger.info('PageFunction : Pageswitch - Exit')
 
 	def exit_page1(self, instance):
-		self.remove_mywidget('Exit_auth')
+		RemovesClears.remove_mywidget(self, 'Exit_auth')
 		id='Exit'
 		self.RoundedButton(id + '_auth',('btn_red_rounded_left.png', 'btn_red_rounded_right.png'), '--- CONFIRM ---', self.exit_page2, (328,81), 197, '42sp', soundFile='complete.wav')
 		Logger.info('PageFunction : Pageswitch - Exit 1')
 
 	def exit_page2(self, instance):
-		self.clear_pages()
-		self.remove_mywidget('Navigation')
+		RemovesClears.clear_pages(self)
+		RemovesClears.remove_mywidget(self, 'Navigation')
 		Clock.schedule_interval(lambda a: App.get_running_app().stop(), 4.5)
 
 	def elitedangerous_pips(self, instance):
-		self.clear_pages()
+		RemovesClears.clear_pages(self)
 		TopStatusBar.changeCaption(self.TopStatusBar, 'manage power')
 		self.Page_ElitePIPS()
 		Logger.info('PageFunction : Pageswitch - Elite PIPS')
 
 	def elitedangerous_limpets(self, instance):
-		self.clear_pages()
+		RemovesClears.clear_pages(self)
 		TopStatusBar.changeCaption(self.TopStatusBar, 'elite limpets')
 		self.Page_EliteLimpets()
 		Logger.info('PageFunction : Pageswitch - EliteLimpets')
 
 	def page_inara(self, instance):
-		self.clear_pages()
+		RemovesClears.clear_pages(self)
 		TopStatusBar.changeCaption(self.TopStatusBar, 'inara')
 		self.Page_inaracz()
 		Logger.info('PageFunction : Pageswitch - inara')
@@ -320,7 +284,7 @@ class MainLayout(FloatLayout):
 		id='inaracz'
 		if self.shipinstance == None:
 			self.shipinstance = Ships(Config_LCARS)
-		self.remove_mywidget('inaracz')
+		RemovesClears.remove_mywidget(self, 'inaracz')
 
 		status = ''
 		if self.shipinstance.status == False:
@@ -360,16 +324,16 @@ class MainLayout(FloatLayout):
 	def Page_ElitePIPS(self):
 		id='ElitePIPS'
 
-		self.RectangleButton(id, 'engines', self.btn_speed, (118,371),233)
-		self.RectangleButton(id, 'weapons', self.btn_weapons, (118,313),233)
-		self.RectangleButton(id, 'system', self.btn_system, (118,256),233)
-		self.RectangleButton(id, 'reset', self.btn_reset, (118,198),233)
+		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'engines', self.btn_speed, (118,371),233)
+		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'weapons', self.btn_weapons, (118,313),233)
+		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'system', self.btn_system, (118,256),233)
+		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'reset', self.btn_reset, (118,198),233)
 
-		self.RectangleButton(id, 'Combat turn', self.btn_combatturn, (538,340),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 153,205,255), soundFile='man_combatturn.wav')
-		self.RectangleButton(id, 'Alpha Strike', self.btn_alphastrike, (494,255),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 181,0,6), soundFile='man_alphastrike.wav')
-		self.RectangleButton(id, 'Head to Head', self.btn_headtohead, (494,170),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 181,0,6), soundFile='man_headtohead.wav')
-		self.RectangleButton(id, 'Omega one', self.btn_omegaone, (185,85),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 0,168,89), soundFile='man_omegaone.wav')
-		self.RectangleButton(id, 'Omega two', self.btn_omegatwo, (471,85),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 0,168,89), soundFile='man_omegatwo.wav')
+		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'Combat turn', self.btn_combatturn, (538,340),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 153,205,255), soundFile='man_combatturn.wav')
+		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'Alpha Strike', self.btn_alphastrike, (494,255),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 181,0,6), soundFile='man_alphastrike.wav')
+		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'Head to Head', self.btn_headtohead, (494,170),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 181,0,6), soundFile='man_headtohead.wav')
+		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'Omega one', self.btn_omegaone, (185,85),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 0,168,89), soundFile='man_omegaone.wav')
+		ButtonClasses.RectangleButton(self, Config_LCARS, id, 'Omega two', self.btn_omegatwo, (471,85),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 0,168,89), soundFile='man_omegatwo.wav')
 
 
 	def Page_EliteLimpets(self):
@@ -431,7 +395,8 @@ class MainLayout(FloatLayout):
 
 	def btn_test(self, instance):
 		#print(type(returnPreloadedAsset('ringin')))
-		TopStatusBar.changeCaption(self.TopStatusBar, 'Elite LCARS')
+		#TopStatusBar.changeCaption(self.TopStatusBar, 'Elite LCARS')
+		RemovesClears.remove_mywidget(self, 'TopStatusBar')
 
 	def btn_limpets_collector(self, instance):
 		sequence = ['{VK_NUMPAD4}', '{VK_NUMPAD4}', '{VK_ADD}', '{VK_NUMPAD4}']
