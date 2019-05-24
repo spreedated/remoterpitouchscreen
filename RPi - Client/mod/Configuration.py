@@ -8,6 +8,7 @@ class Configuration():
 	socketfile='client_udp.py'
 	inara_username = ''
 	inara_password = ''
+	inara_apikey = ''
 
 	confFilePath = os.getcwd() + '/config.conf'
 
@@ -27,6 +28,7 @@ class Configuration():
 					self.socketfile = 'client_udp.py'
 				self.inara_username = str(config.get('INARA','username'))
 				self.inara_password = str(config.get('INARA','password'))
+				self.inara_apikey = str(config.get('INARA','apikey'))
 				# ###
 				Logger.info('Configuration : Loaded sucessfully')
 			except Exception as e :
@@ -49,5 +51,6 @@ class Configuration():
 			f.write('\n[INARA]\n')
 			f.write('username=\n')
 			f.write('password=\n')
+			f.write('apikey=\n')
 			f.close()
 			Logger.info('Configuration : Created successfully')

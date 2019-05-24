@@ -77,6 +77,7 @@ from mod.Preload import PreloadAssets
 from mod.Sound import Sounds
 from mod.Controls import *
 from mod.RemovesClears import RemovesClears
+from mod.API_Works import Inara
 
 if sys.version_info[0] != 3:
 	print("This script requires Python version 3.x")
@@ -106,6 +107,8 @@ class MainLayout(FloatLayout):
 		self.LeftNavigation()
 		self.Page_Welcome()
 		#Sounds.PlaySound(Preload_LCARS, 'datalink.mp3')
+
+		Preload_LCARS.PreloadEDAssets_Thread(Preload_LCARS)
 
 	def LeftNavigation(self):
 		Buttons.Button_LeftNav(self, Config_LCARS, Preload_LCARS, 'debug', 0, 2, 1, self.btn_test)
@@ -191,7 +194,15 @@ class MainLayout(FloatLayout):
 		#	Color(1,0.5,0.9,1)
 		#	Rectangle(pos=lbl_test.pos, size=lbl_test.size)
 		
-		lbl_info2 = Label(text='Loading...\nfdfds\nfdsfdsgfdgfdgfdgfdddg3333', pos=(0,0), size=(500,500), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='96sp', id=id, halign='center')
+		x = Inara(Config_LCARS)
+		output = None
+
+		if x.state:
+			output = 'CombatRank: ' + x.cmdr_combatrank + '\nTradeRank: ' + x.cmdr_traderank + '\n'
+		else:
+			output = 'Something went wrong'
+
+		lbl_info2 = Label(text=output, pos=(0,0), size=(500,500), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='96sp', id=id, halign='center')
 		lbl_test.add_widget(lbl_info2)
 
 		self.add_widget(lbl_test)
@@ -288,7 +299,15 @@ class MainLayout(FloatLayout):
 	def btn_test(self, instance):
 		#print(type(returnPreloadedAsset('ringin')))
 		#TopStatusBar.changeCaption(self.TopStatusBar, 'Elite LCARS')
-		RemovesClears.remove_mywidget(self, 'TopStatusBar')
+		#RemovesClears.remove_mywidget(self, 'TopStatusBar')
+		#Buttons.RoundedButtonSquare(self, Config_LCARS, Preload_LCARS, 'test',('btn_orange_upLeft.png','btn_orange_upRight.png','btn_orange_downLeft.png','btn_orange_downRight.png'), 'elite', None, (100,100), 150, 180, 'explorer_rank8', '48sp', ColorConversion.RGBA_to_Float(None, 254,154,0))
+		#print(len(Preload_LCARS.preloadedAssets))
+
+		for element in Preload_LCARS.preloadedAssets:
+			if 'Federal_Dropship_schematic.png' in element[0]:
+				print(element[0])
+				bg = Image(texture=element[1], pos=(1,0), size_hint=(None,None), size=(800,480), id='test')
+				self.add_widget(bg)
 
 	def btn_limpets_collector(self, instance):
 		sequence = ['{VK_NUMPAD4}', '{VK_NUMPAD4}', '{VK_ADD}', '{VK_NUMPAD4}']

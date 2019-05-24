@@ -34,7 +34,8 @@ class Buttons():
 
 		elements = [btn,btn_txt]
 		for x in elements:
-			x.bind(on_press=action)
+			if action != None:
+				x.bind(on_press=action)
 			if configClass.clicksounds == 1:
 				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass))
 			self.add_widget(x)
@@ -49,7 +50,8 @@ class Buttons():
 
 		elements = [btn, btn_txt]
 		for x in elements:
-			x.bind(on_press=action)
+			if action != None:
+				x.bind(on_press=action)
 			if clickSound and configClass.clicksounds == 1 and soundFile == None:
 				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass))
 			if soundFile != None:
@@ -67,7 +69,8 @@ class Buttons():
 
 		elements = [btn_right,btn_left,btn_center,btn_lbl]
 		for x in elements:
-			x.bind(on_press=action)
+			if action != None:
+				x.bind(on_press=action)
 			if clickSound and configClass.clicksounds == 1 and soundFile == None:
 				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass))
 			if soundFile != None:
@@ -112,7 +115,8 @@ class Buttons():
 
 		elements = [btn_downRight,btn_downLeft,btn_upLeft,btn_upRight,btn_Center,btn_rightCenter,btn_leftCenter,btn_downCenter,btn_upCenter,btn_lbl,btn_icon]
 		for x in elements:
-			x.bind(on_press=action)
+			if action != None:
+				x.bind(on_press=action)
 			if clickSound and configClass.clicksounds == 1 and soundFile == None:
 				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass))
 			if soundFile != None:
