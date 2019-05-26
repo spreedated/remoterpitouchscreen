@@ -4,6 +4,7 @@ from kivy.uix.behaviors import ButtonBehavior
 from kivy.graphics import Color, Rectangle, RoundedRectangle
 from kivy.uix.scrollview import ScrollView
 from kivy.properties import StringProperty
+from kivy.graphics.instructions import InstructionGroup
 from mod.Color import ColorConversion
 from mod.Sound import Sounds
 
@@ -19,8 +20,8 @@ class Buttons():
 	# Left Navigation
 	leftPositions = [(11,383),(11,336),(11,290),(11,243),(11,196),(11,150),(11,103),(11,56)]
 
-	def Button_LeftNav(self, configClass, preloadClass, btnText, btnEnumPosition, btnEnumColor, btnClickSounds=0, action=None):
-		btn = LCARS_LabelButton(pos=Buttons.leftPositions[btnEnumPosition], size=(96,40), size_hint=(None,None), id='btnLeftNavigation')
+	def Button_LeftNav(self, configClass, preloadClass, btnText, btnEnumPosition, btnEnumColor, id, btnClickSounds=0, action=None):
+		btn = LCARS_LabelButton(pos=Buttons.leftPositions[btnEnumPosition], size=(96,40), size_hint=(None,None), id=id)
 		with btn.canvas.before:
 			if btnEnumColor == 0: #Yellow
 				Color(1,1,0.2,1)
@@ -29,7 +30,7 @@ class Buttons():
 			if btnEnumColor == 2: #Blue
 				Color(0.6,0.8,1,1)
 			Rectangle(pos=btn.pos, size=btn.size)
-		btn_txt = Label(text=btnText, pos=(btn.pos[0]+2,btn.pos[1]-5), size=(50,13), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', color=(0,0,0,1), id='btnLeftNavigation')
+		btn_txt = Label(text=btnText, pos=(btn.pos[0]+2,btn.pos[1]-5), size=(50,13), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', color=(0,0,0,1), id=id)
 		btn_txt.bind(texture_size=btn_txt.setter('size'))
 
 		elements = [btn,btn_txt]
@@ -111,4 +112,22 @@ class Buttons():
 		elements = [headline,icon, btn,btn_txt]
 		for x in elements:
 			mainClass.add_widget(x)
+
+	def Inara_MainButton(self, mainClass, configClass, preloadClass, id, labeltext, position, action=None, textsize='48sp', backgroundColor=(0.71,0,0.02,1), foregroundColor=(0,0,0,1), clickSound=True, soundFile=None):
+		btn = LCARS_LabelButton(pos=(position[0],position[1]), size=(197,43), size_hint=(None,None), id=self.id)
+		with btn.canvas.before:
+			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
+			RoundedRectangle(pos=btn.pos, size=btn.size, radius=[22,22,22,22])
+
+		btn_txt = Label(text=labeltext, pos=(position[0],position[1]), size=(197,43), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size=textsize, color=(0,0,0,1), id=id)
+
+		elements = [btn,btn_txt]
+		for x in elements:
+			if action != None:
+				x.bind(on_press=action)
+			if clickSound and configClass.clicksounds == 1 and soundFile == None:
+				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass))
+			if soundFile != None:
+				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, soundFile))
+			self.add_widget(x)
 

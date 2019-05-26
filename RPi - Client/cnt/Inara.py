@@ -1,6 +1,5 @@
 import datetime
 import time
-import random
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.image import Image
@@ -11,34 +10,49 @@ from mod.Color import ColorConversion
 from mod.API_Works import API_Inara
 from mod.Controls import *
 from mod.Sound import Sounds
+from mod.RemovesClears import RemovesClears
 
 class Page_Inara(FloatLayout):
 	id='inaracz'
+
+	mainClass = None
+	configClass = None
+	preloadClass = None
 
 	hexagon = ObjectProperty()
 	hexagon_timer =  None
 
 	def __init__(self, mainClass, configClass, preloadClass, **kwargs):
 		super().__init__(**kwargs)
-		
-		bg = Image(texture=preloadClass.returnPreloadedAsset('bg_inara.png'), pos=(118,81), size_hint=(None,None), size=(501,287), id=self.id)
-		mainClass.add_widget(bg)
+		self.mainClass = mainClass
+		self.configClass = configClass
+		self.preloadClass = preloadClass
 
-		self.DrawBackground(mainClass)
-		
+		self.Page_Main()
+
+	def Page_Main(self):
+		bg = Image(texture=self.preloadClass.returnPreloadedAsset('bg_inara.png'), pos=(118,81), size_hint=(None,None), size=(501,287), id=self.id)
+		self.mainClass.add_widget(bg)
+
+		self.DrawBackground()
 
 		#animation
-		self.hexagon = Image(texture=preloadClass.returnPreloadedAsset('inara_hexagon.png'), pos=(465,236), size_hint=(None,None), size=(40,23), id=self.id + '_hexagon')
-		mainClass.add_widget(self.hexagon)
+		self.hexagon = Image(texture=self.preloadClass.returnPreloadedAsset('inara_hexagon.png'), pos=(465,236), size_hint=(None,None), size=(40,23), id=self.id + '_hexagon')
+		self.mainClass.add_widget(self.hexagon)
 
-		self.animation(mainClass)
+		self.animation()
 		# ###
+
+		#DEBUG
+		Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'fleet', (212,155), self.Goto_FleetPage, foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
+		print('debug')
+		return
 
 		#Loading up INARA API Works
 		lbl_info = Label(text='Loading...', pos=(204,288), size=(577,120), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='64sp', id=self.id, halign='center')
-		mainClass.add_widget(lbl_info)
+		self.mainClass.add_widget(lbl_info)
 		
-		x = API_Inara(configClass)
+		x = API_Inara(self.configClass)
 		output = None
 
 		if x.errormsg != None:
@@ -46,24 +60,27 @@ class Page_Inara(FloatLayout):
 			return # Stop here if something went wrong, like wrong api key
 		
 		Sounds.PlaySound(preloadClass, 'establishing_datalink.wav')
-		mainClass.remove_widget(lbl_info)
+		self.mainClass.remove_widget(lbl_info)
 		# ###
 
 		#Add Rankings Combat Icons and Labels
-		Buttons.Inara_RankButton(self, mainClass, configClass, preloadClass, self.id, 'combat', x.cmdr_combatrank, (200,279), ColorConversion.RGBA_to_Float(181,0,6))
-		Buttons.Inara_RankButton(self, mainClass, configClass, preloadClass, self.id, 'trade', x.cmdr_traderank, (348,279), ColorConversion.RGBA_to_Float(254,154,0))
-		Buttons.Inara_RankButton(self, mainClass, configClass, preloadClass, self.id, 'exploration', x.cmdr_explorationrank, (495,279), ColorConversion.RGBA_to_Float(153,205,255))
-		Buttons.Inara_RankButton(self, mainClass, configClass, preloadClass, self.id, 'cqc', x.cmdr_cqcrank, (642,279), ColorConversion.RGBA_to_Float(237,26,33))
+		Buttons.Inara_RankButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'combat', x.cmdr_combatrank, (200,279), ColorConversion.RGBA_to_Float(181,0,6))
+		Buttons.Inara_RankButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'trade', x.cmdr_traderank, (348,279), ColorConversion.RGBA_to_Float(254,154,0))
+		Buttons.Inara_RankButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'exploration', x.cmdr_explorationrank, (495,279), ColorConversion.RGBA_to_Float(153,205,255))
+		Buttons.Inara_RankButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'cqc', x.cmdr_cqcrank, (642,279), ColorConversion.RGBA_to_Float(237,26,33))
 
-	def animation(self, mainClass):
-		self.hexagon_timer = Clock.schedule_interval(lambda a: self.timer(mainClass), 0.02)
+		#Buttons
+		Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'fleet', (212,155), self.Goto_FleetPage, foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
+
+	def animation(self):
+		self.hexagon_timer = Clock.schedule_interval(lambda a: self.timer(), 0.02)
 
 	direction = 'r'
-	def timer(self, mainClass):
+	def timer(self):
 		#kill timer if animation not active
 		active = False
 		for x in range(5):
-			for child in mainClass.children:
+			for child in self.mainClass.children:
 				if child.id != None:
 					if 'hexagon' in child.id:
 						active = True
@@ -83,7 +100,7 @@ class Page_Inara(FloatLayout):
 			if acc[0] <= 465:
 				self.direction = 'r'
 		
-	def DrawBackground(self, mainClass):
+	def DrawBackground(self):
 		rect0 = Label(pos=(118,371), size=(78,60), size_hint=(None,None), id=self.id)
 		rect0_col = ColorConversion.RGBA_to_Float(156,160,255)
 		with rect0.canvas.after:
@@ -135,4 +152,12 @@ class Page_Inara(FloatLayout):
 		
 		elements =[rect0,rect1,rect2,rect3,rect4,rect5,rect6,rect7]
 		for x in elements:
-			mainClass.add_widget(x)
+			self.mainClass.add_widget(x)
+
+	def Goto_FleetPage(self, instance):
+		#Clear page of Main
+		RemovesClears.remove_mywidget(self.mainClass, self.id)
+
+	def Goto_Back_MainWindow(self):
+		self.Page_Main()
+		
