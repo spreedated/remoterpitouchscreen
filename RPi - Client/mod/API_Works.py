@@ -4,14 +4,14 @@ import requests
 import datetime
 from kivy.logger import Logger
 
-class Inara():
+class API_Inara():
 	SESSION = requests.session()
-	CombatRanks = ['Harmless','Mostly Harmless','Novice','Competent','Expert','Master','Dangerous','Deadly','Elite']
-	TradeRanks = ['Penniless','Mostly Penniless','Peddler','Dealer','Merchant','Broker','Entrepreneur','Tycoon','Elite']
-	ExplorationRanks = ['Aimless','Mostly Aimless','Scout','Surveyor','Trailblazer','Pathfinder','Ranger','Pioneer','Elite']
-	CQCRanks = ['Helpless','Mostly Helpless','Amateur','Semi Professional','Professional','Champion','Hero','Legend','Elite']
+	CombatRanks = [('Harmless','combat_rank0.png'),('Mostly Harmless','combat_rank1.png'),('Novice','combat_rank2.png'),('Competent','combat_rank3.png'),('Expert','combat_rank4.png'),('Master','combat_rank5.png'),('Dangerous','combat_rank6.png'),('Deadly','combat_rank7.png'),('Elite','combat_rank8.png')]
+	TradeRanks = [('Penniless','trade_rank0.png'),('Mostly Penniless','trade_rank1.png'),('Peddler','trade_rank2.png'),('Dealer','trade_rank3.png'),('Merchant','trade_rank4.png'),('Broker','trade_rank5.png'),('Entrepreneur','trade_rank6.png'),('Tycoon','trade_rank7.png'),('Elite','combat_rank8.png')]
+	ExplorationRanks = [('Aimless','explorer_rank0.png'),('Mostly Aimless','explorer_rank1.png'),('Scout','explorer_rank2.png'),('Surveyor','explorer_rank3.png'),('Trailblazer','explorer_rank4.png'),('Pathfinder','explorer_rank5.png'),('Ranger','explorer_rank6.png'),('Pioneer','explorer_rank7.png'),('Elite','explorer_rank8.png')]
+	CQCRanks = [('Helpless','cqc_rank0.png'),('Mostly Helpless','cqc_rank1.png'),('Amateur','cqc_rank2.png'),('Semi Professional','cqc_rank3.png'),('Professional','cqc_rank4.png'),('Champion','cqc_rank5.png'),('Hero','cqc_rank6.png'),('Legend','cqc_rank7.png'),('Elite','cqc_rank8.png')]
 
-	state = True
+	errormsg = None
 
 	apikey = None
 	cmdr_name = None
@@ -28,7 +28,7 @@ class Inara():
 		#read apikey
 		if len(apikey) <= 6:
 			Logger.critical('API Inara : No API Key')
-			self.state = False
+			self.errormsg = 'No API Key'
 			return
 		self.apikey = apikey
 		self.GetCmdrName()
@@ -41,7 +41,8 @@ class Inara():
 
 		if json_resp['header']['eventStatus'] != requests.codes.ok:
 			Logger.critical('API Inara : ' + str(json_resp['header']['eventStatusText']))
-			self.state = False
+			self.errormsg = str(json_resp['header']['eventStatusText'])
+			return
 		else:
 			for element in json_resp['events'][0]['eventData']['commanderRanksPilot']:
 				if element['rankName'] == 'combat':
@@ -64,7 +65,8 @@ class Inara():
 
 		if json_resp['header']['eventStatus'] != requests.codes.ok:
 			Logger.critical('API Inara : ' + str(json_resp['header']['eventStatusText']))
-			self.state = False
+			self.errormsg = str(json_resp['header']['eventStatusText'])
+			return
 		else:
 			self.cmdr_name = json_resp['header']['eventData']['userName']
 			Logger.info('API Inara : CMDR Name retrieved ['+self.cmdr_name+']')

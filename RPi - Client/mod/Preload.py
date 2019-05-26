@@ -7,8 +7,10 @@ from kivy.core.audio import SoundLoader
 class PreloadAssets(object):
 	preloadedAssets = []
 
-	def __init__(self, *args, **kwargs):
+	def __init__(self, configClass, *args, **kwargs):
 		super().__init__(*args, **kwargs)
+
+		Logger.info('Preload : Loading files to memory... Please stay patient...')
 
 		#preload IMAGES
 		count = 0
@@ -32,6 +34,12 @@ class PreloadAssets(object):
 		else:
 			Logger.info('Preload : ' + str(count) + ' Soundfiles loaded to memory')
 
+		#preload ED ASSETS
+		if configClass.edassets:
+			self.PreloadEDAssets()
+
+		Logger.info('Preload : Loading COMPLETE!')
+
 	def PreloadEDAssets(self):
 		#preload Elite Dangerous Assets
 		count = 0
@@ -39,28 +47,11 @@ class PreloadAssets(object):
 			for file in os.listdir(r):
 				if file.endswith(".png"):
 					count+=1
-					print(os.path.join(r,file))
 					self.preloadedAssets.append([file, Image(source=os.path.join(r,file)).texture])
 		if count == 1:
 			Logger.info('Preload : one ED-Asset Image loaded to memory as textures')
 		else:
 			Logger.info('Preload : ' + str(count) + ' ED-Assets Image loaded to memory as textures')
-			
-	def _PreloadEDAssets_Thread(self, instance):
-		#preload Elite Dangerous Assets
-		count = 0
-		for r,d,f in os.walk("img\edassets"):
-			for file in os.listdir(r):
-				if file.endswith(".png"):
-					count+=1
-					instance.preloadedAssets.append([file, Image(source=os.path.join(r,file)).texture])
-		if count == 1:
-			Logger.info('Preload : one ED-Asset Image loaded to memory as textures')
-		else:
-			Logger.info('Preload : ' + str(count) + ' ED-Assets Image loaded to memory as textures')
-
-	def PreloadEDAssets_Thread(self, instance):
-		threading.Thread(target=lambda:self._PreloadEDAssets_Thread(instance)).start()
 
 	def returnPreloadedAsset(self, AssetName):
 		for x in self.preloadedAssets:

@@ -3,12 +3,17 @@ import configparser
 from kivy.logger import Logger
 
 class Configuration():
-	clicksounds=1
+	#main
 	socket='udp'
 	socketfile='client_udp.py'
+	#sound
+	clicksounds=1
+	#inara
 	inara_username = ''
 	inara_password = ''
 	inara_apikey = ''
+	#preload
+	edassets = False
 
 	confFilePath = os.getcwd() + '/config.conf'
 
@@ -29,23 +34,26 @@ class Configuration():
 				self.inara_username = str(config.get('INARA','username'))
 				self.inara_password = str(config.get('INARA','password'))
 				self.inara_apikey = str(config.get('INARA','apikey'))
+				acc = str(config.get('PRELOAD','edassets'))
+				if acc == '1':
+					self.edassets = True
 				# ###
 				Logger.info('Configuration : Loaded sucessfully')
 			except Exception as e :
-				Logger.info('Configuration : ' + e)
+				Logger.info('Configuration : ' + str(e))
 				try:
 					os.remove(self.confFilePath)
 				except Exception as e:
-					Logger.info('Configuration : ' + e)
+					Logger.info('Configuration : ' + str(e))
 		else:
-			self.CreateConfig()
-			
-		
+			self.CreateConfig()	
 
 	def CreateConfig(self):
 		with open(self.confFilePath, 'x') as f:
 			f.write('[MAIN]\n')
 			f.write('socket=udp\n')
+			f.write('\n[PRELOAD]\n')
+			f.write('edassets=0\n')
 			f.write('\n[SOUND]\n')
 			f.write('clicksounds=1\n')
 			f.write('\n[INARA]\n')

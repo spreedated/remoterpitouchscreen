@@ -16,7 +16,7 @@ elif os.name == 'posix': #for RPi/Linux
 	os.environ['KIVY_GL_BACKEND'] = 'gl'
 	os.environ['KIVY_AUDIO'] = 'gstplayer'
 	os.environ['KIVY_VIDEO'] = 'gstplayer'
-os.environ['KIVY_TEXT'] = 'sdl2'
+#os.environ['KIVY_TEXT'] = 'sdl2'
 #os.environ["KIVY_NO_CONFIG"] = "0" # BROKEN -- produces an error(no input at all) on rpi touchdisplay # DONT USE
 os.environ["KIVY_NO_FILELOG"] = "1" # No spam
 import sys
@@ -77,14 +77,15 @@ from mod.Preload import PreloadAssets
 from mod.Sound import Sounds
 from mod.Controls import *
 from mod.RemovesClears import RemovesClears
-from mod.API_Works import Inara
+from cnt.Inara import *
 
 if sys.version_info[0] != 3:
 	print("This script requires Python version 3.x")
 	sys.exit(1)
 
 Config_LCARS = Configuration()
-Preload_LCARS = PreloadAssets()
+Preload_LCARS = PreloadAssets(Config_LCARS)
+
 
 class MainLayout(FloatLayout):
 	shipinstance = None
@@ -106,9 +107,6 @@ class MainLayout(FloatLayout):
 
 		self.LeftNavigation()
 		self.Page_Welcome()
-		#Sounds.PlaySound(Preload_LCARS, 'datalink.mp3')
-
-		Preload_LCARS.PreloadEDAssets_Thread(Preload_LCARS)
 
 	def LeftNavigation(self):
 		Buttons.Button_LeftNav(self, Config_LCARS, Preload_LCARS, 'debug', 0, 2, 1, self.btn_test)
@@ -136,7 +134,7 @@ class MainLayout(FloatLayout):
 	def exit_page1(self, instance):
 		RemovesClears.remove_mywidget(self, 'Exit_auth')
 		id='Exit'
-		Buttons.RoundedButton(self, Config_LCARS, Preload_LCARS, id + '_auth',('btn_red_rounded_left.png', 'btn_red_rounded_right.png'), '--- CONFIRM ---', self.exit_page2, (328,81), 197, '42sp', soundFile='complete.wav')
+		Buttons.RoundedButton(self, Config_LCARS, Preload_LCARS, id + '_auth', '--- CONFIRM ---', self.exit_page2, (328,81), 233, '42sp', soundFile='complete.wav')
 		Logger.info('PageFunction : Pageswitch - Exit 1')
 
 	def exit_page2(self, instance):
@@ -164,54 +162,14 @@ class MainLayout(FloatLayout):
 #endregion
 
 #region Pages
-	def initinThread(self):
-		id='inaracz'
-		if self.shipinstance == None:
-			self.shipinstance = Ships(Config_LCARS)
-		RemovesClears.remove_mywidget(self, 'inaracz')
-
-		
-		if self.shipinstance.status != None:
-			status = self.shipinstance.status
-		else:
-			status = 'Loaded'
-
-		lbl_info = Label(text=status, pos=(282,256), size=(325,152), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='96sp', id=id, halign='center')
-		self.add_widget(lbl_info)
-
-		
-
 	def Page_inaracz(self):
-		id='inaracz'
-		lbl_info = Label(text='Loading...', pos=(282,256), size=(325,152), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='96sp', id=id, halign='center')
-		self.add_widget(lbl_info)
-
-		#threading.Thread(target=self.initinThread).start()
-
-		#lbl_test = ScrollView(text='dasdasdsadsadsa\nfdsfdsfdsfdsfds\ndsfdsfdsfsafs33\n\n\n\nasd2d2', pos=(282,128), size=(325,152), size_hint=(None,None), id=id, font_name='fnt/lcarsgtj3.ttf', font_size='96sp')
-		lbl_test = ScrollView(pos=(282,128), size=(325,152), size_hint=(None,None), id=id, bar_width=4, do_scroll_y=True, do_scroll_x=True)
-		#with lbl_test.canvas.before:
-		#	Color(1,0.5,0.9,1)
-		#	Rectangle(pos=lbl_test.pos, size=lbl_test.size)
-		
-		x = Inara(Config_LCARS)
-		output = None
-
-		if x.state:
-			output = 'CombatRank: ' + x.cmdr_combatrank + '\nTradeRank: ' + x.cmdr_traderank + '\n'
-		else:
-			output = 'Something went wrong'
-
-		lbl_info2 = Label(text=output, pos=(0,0), size=(500,500), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='96sp', id=id, halign='center')
-		lbl_test.add_widget(lbl_info2)
-
-		self.add_widget(lbl_test)
+		self.add_widget(Page_Inara(self, Config_LCARS, Preload_LCARS))
 		
 	def Page_Exit(self):
 		id='Exit'
 		lbl_shutdown = Label(text='COMPUTER CORE\nSHUTDOWN', pos=(282,256), size=(325,152), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='96sp', id=id, halign='center')
 		self.add_widget(lbl_shutdown)
-		Buttons.RoundedButton(self, Config_LCARS, Preload_LCARS, id + '_auth',('btn_red_rounded_left.png', 'btn_red_rounded_right.png'), '--- AUTHORIZE ---', self.exit_page1, (239,167), 370, soundFile='beep.wav')
+		Buttons.RoundedButton(self, Config_LCARS, Preload_LCARS, id + '_auth', '--- AUTHORIZE ---', self.exit_page1, (239,167), 411, soundFile='beep.wav')
 
 	def Page_Welcome(self):
 		id='Welcome'
@@ -232,11 +190,11 @@ class MainLayout(FloatLayout):
 		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'system', self.btn_system, (118,256),233)
 		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'reset', self.btn_reset, (118,198),233)
 
-		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'Combat turn', self.btn_combatturn, (538,340),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 153,205,255), soundFile='man_combatturn.wav')
-		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'Alpha Strike', self.btn_alphastrike, (494,255),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 181,0,6), soundFile='man_alphastrike.wav')
-		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'Head to Head', self.btn_headtohead, (494,170),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 181,0,6), soundFile='man_headtohead.wav')
-		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'Omega one', self.btn_omegaone, (185,85),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 0,168,89), soundFile='man_omegaone.wav')
-		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'Omega two', self.btn_omegatwo, (471,85),233, backgroundColor=ColorConversion.RGBA_to_Float(None, 0,168,89), soundFile='man_omegatwo.wav')
+		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'Combat turn', self.btn_combatturn, (538,340),233, backgroundColor=ColorConversion.RGBA_to_Float(153,205,255), soundFile='man_combatturn.wav')
+		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'Alpha Strike', self.btn_alphastrike, (494,255),233, backgroundColor=ColorConversion.RGBA_to_Float(181,0,6), soundFile='man_alphastrike.wav')
+		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'Head to Head', self.btn_headtohead, (494,170),233, backgroundColor=ColorConversion.RGBA_to_Float(181,0,6), soundFile='man_headtohead.wav')
+		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'Omega one', self.btn_omegaone, (185,85),233, backgroundColor=ColorConversion.RGBA_to_Float(0,168,89), soundFile='man_omegaone.wav')
+		Buttons.RectangleButton(self, Config_LCARS, Preload_LCARS, id, 'Omega two', self.btn_omegatwo, (471,85),233, backgroundColor=ColorConversion.RGBA_to_Float(0,168,89), soundFile='man_omegatwo.wav')
 
 
 	def Page_EliteLimpets(self):
@@ -244,11 +202,11 @@ class MainLayout(FloatLayout):
 		btn_positions_first_row=[(124,251),(289,251),(453,251),(618,251)]
 		btn_positions_second_row=[(124,49),(289,49),(453,49),(618,49)]
 		#COLLECTOR
-		Buttons.RoundedButtonSquare(self, Config_LCARS, Preload_LCARS, id,('btn_orange_upLeft.png','btn_orange_upRight.png','btn_orange_downLeft.png','btn_orange_downRight.png'), 'COLLECTOR', self.btn_limpets_collector, btn_positions_first_row[3], 150, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 254,154,0))
+		Buttons.RoundedButtonSquare(self, Config_LCARS, Preload_LCARS, id, 'COLLECTOR', self.btn_limpets_collector, btn_positions_first_row[3], 150, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(254,154,0))
 		#DECON
-		Buttons.RoundedButtonSquare(self, Config_LCARS, Preload_LCARS, id,('btn_lightblue_upLeft.png','btn_lightblue_upRight.png','btn_lightblue_downLeft.png','btn_lightblue_downRight.png'), 'DECON', self.btn_limpets_decon, btn_positions_first_row[0], 150, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 153,205,255))
+		Buttons.RoundedButtonSquare(self, Config_LCARS, Preload_LCARS, id, 'DECON', self.btn_limpets_decon, btn_positions_first_row[0], 150, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(153,205,255))
 		#REPAIR
-		Buttons.RoundedButtonSquare(self, Config_LCARS, Preload_LCARS, id,('btn_green_upLeft.png','btn_green_upRight.png','btn_green_downLeft.png','btn_green_downRight.png'), 'REPAIR', self.btn_limpets_repair, btn_positions_second_row[2], 150, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(None, 0,168,89))
+		Buttons.RoundedButtonSquare(self, Config_LCARS, Preload_LCARS, id, 'REPAIR', self.btn_limpets_repair, btn_positions_second_row[2], 150, 180, 'limpet_black.png', '48sp', ColorConversion.RGBA_to_Float(0,168,89))
 
 #endregion
 
@@ -300,14 +258,16 @@ class MainLayout(FloatLayout):
 		#print(type(returnPreloadedAsset('ringin')))
 		#TopStatusBar.changeCaption(self.TopStatusBar, 'Elite LCARS')
 		#RemovesClears.remove_mywidget(self, 'TopStatusBar')
-		#Buttons.RoundedButtonSquare(self, Config_LCARS, Preload_LCARS, 'test',('btn_orange_upLeft.png','btn_orange_upRight.png','btn_orange_downLeft.png','btn_orange_downRight.png'), 'elite', None, (100,100), 150, 180, 'explorer_rank8', '48sp', ColorConversion.RGBA_to_Float(None, 254,154,0))
+		#Buttons.RoundedButtonSquare(self, Config_LCARS, Preload_LCARS, 'test',('btn_orange_upLeft.png','btn_orange_upRight.png','btn_orange_downLeft.png','btn_orange_downRight.png'), 'elite', None, (100,100), 150, 180, 'explorer_rank8', '48sp', ColorConversion.RGBA_to_Float(254,154,0))
 		#print(len(Preload_LCARS.preloadedAssets))
 
-		for element in Preload_LCARS.preloadedAssets:
-			if 'Federal_Dropship_schematic.png' in element[0]:
-				print(element[0])
-				bg = Image(texture=element[1], pos=(1,0), size_hint=(None,None), size=(800,480), id='test')
-				self.add_widget(bg)
+		#for element in Preload_LCARS.preloadedAssets:
+		#	if 'Federal_Dropship_schematic.png' in element[0]:
+		#		print(element[0])
+		#		bg = Image(texture=element[1], pos=(1,0), size_hint=(None,None), size=(800,480), id='test')
+		#		self.add_widget(bg)
+
+		RemovesClears.remove_mywidget(self, 'inaracz')
 
 	def btn_limpets_collector(self, instance):
 		sequence = ['{VK_NUMPAD4}', '{VK_NUMPAD4}', '{VK_ADD}', '{VK_NUMPAD4}']
