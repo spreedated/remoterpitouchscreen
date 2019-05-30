@@ -1,8 +1,5 @@
-from kivy.app import App
-from kivy.clock import Clock
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
-from kivy.graphics import Color, Rectangle
 from kivy.logger import Logger
 from mod.Controls import *
 from mod.RemovesClears import RemovesClears

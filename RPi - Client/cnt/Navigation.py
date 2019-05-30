@@ -13,6 +13,7 @@ from cnt.Exit import *
 from cnt.Welcome import *
 from cnt.Elite_Limpets import *
 from cnt.Elite_PIPS import *
+from cnt.Fleet import *
 
 class LeftNavigation(FloatLayout):
 	id='btnLeftNavigation'
@@ -21,15 +22,17 @@ class LeftNavigation(FloatLayout):
 	configClass = None
 	preloadClass = None
 	TopStatusBar = None
+	infoClass = None
 
-	def __init__(self, mainClass, configClass, preloadClass, topStatusBarClass, **kwargs):
+	def __init__(self, mainClass, configClass, preloadClass, topStatusBarClass, infoClass, **kwargs):
 		super().__init__(**kwargs)
 		self.mainClass = mainClass
 		self.configClass = configClass
 		self.preloadClass = preloadClass
 		self.TopStatusBar = topStatusBarClass
+		self.infoClass = infoClass
 
-		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'debug', 0, 2, self.id, 1, lambda a: self.PageSwitch('exit'))
+		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'debug', 0, 2, self.id, 1, lambda a: self.PageSwitch('test'))
 		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'inara', 1, 2, self.id, 1, lambda a: self.PageSwitch('inara'))
 		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'welcome', 2, 0, self.id, 1, lambda a: self.PageSwitch('welcome'))
 		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'elite limpets', 4, 1, self.id, 1, lambda a: self.PageSwitch('limpets'))
@@ -46,7 +49,7 @@ class LeftNavigation(FloatLayout):
 		if page == 'inara':
 			self.TopStatusBar.changeCaption('inara')
 			Logger.info('PageFunction : Pageswitch - Inara')
-			self.mainClass.add_widget(Page_Inara(self.mainClass, self.configClass, self.preloadClass))
+			self.mainClass.add_widget(Page_Inara(self.mainClass, self.configClass, self.preloadClass, self.infoClass))
 		if page == 'welcome':
 			self.TopStatusBar.changeCaption('elite lcars')
 			Logger.info('PageFunction : Pageswitch - welcome')
@@ -59,3 +62,11 @@ class LeftNavigation(FloatLayout):
 			self.TopStatusBar.changeCaption('elite pips')
 			Logger.info('PageFunction : Pageswitch - elite pips')
 			self.mainClass.add_widget(ElitePIPSPage(self.mainClass, self.configClass, self.preloadClass))
+		if page == 'fleet':
+			self.TopStatusBar.changeCaption('cmdr fleet')
+			Logger.info('PageFunction : Pageswitch - cmdr fleet')
+			self.mainClass.add_widget(Fleet(self.mainClass, self.configClass, self.preloadClass))
+		if page == 'test':
+			self.TopStatusBar.changeCaption('test')
+			Logger.info('PageFunction : Pageswitch - test')
+			print(self.infoClass.cmdr_combatrank)

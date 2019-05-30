@@ -51,7 +51,3 @@ class MainBackground(FloatLayout):
 
 		txt_menu = Label(text='MENU', pos=(42,435), size=(35,18), size_hint=(None,None), color=(0,0,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='28 sp', id=self.id)
 		mainClass.add_widget(txt_menu)
-
-
-
-

@@ -67,10 +67,12 @@ from mod.Preload import PreloadAssets
 from mod.Sound import Sounds
 from mod.Controls import *
 from mod.RemovesClears import RemovesClears
+from mod.Information import DynamicInformation
 from cnt.Background import *
 from cnt.StatusBars import *
 from cnt.Navigation import *
 from cnt.Welcome import *
+
 
 if sys.version_info[0] != 3:
 	print("This script requires Python version 3.x")
@@ -78,6 +80,7 @@ if sys.version_info[0] != 3:
 
 Config_LCARS = Configuration()
 Preload_LCARS = PreloadAssets(Config_LCARS)
+Info_LCARS = DynamicInformation()
 
 class MainLayout(FloatLayout):
 	shipinstance = None
@@ -94,9 +97,11 @@ class MainLayout(FloatLayout):
 		self.BottomStatusBar = BottomStatusBar(self)		
 		self.add_widget(self.BottomStatusBar)
 		#Main Navigation
-		self.add_widget(LeftNavigation(self, Config_LCARS, Preload_LCARS, self.TopStatusBar))
+		self.add_widget(LeftNavigation(self, Config_LCARS, Preload_LCARS, self.TopStatusBar, Info_LCARS))
 		#First Page
 		self.add_widget(WelcomePage(self, Config_LCARS, Preload_LCARS))
+
+		print(DynamicInformation.cmdr_name)
 
 class MainApp(App):
 	def build(self):

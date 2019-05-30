@@ -6,6 +6,7 @@ from kivy.uix.image import Image
 from kivy.properties import StringProperty, ObjectProperty
 from kivy.graphics import Color, Rectangle
 from kivy.clock import Clock
+from kivy.logger import Logger
 from mod.Color import ColorConversion
 from mod.API_Works import API_Inara
 from mod.Controls import *
@@ -18,21 +19,23 @@ class Page_Inara(FloatLayout):
 	mainClass = None
 	configClass = None
 	preloadClass = None
+	infoClass = None
 
-	hexagon = ObjectProperty()
+	hexagon = Image()
 	hexagon_timer =  None
 
-	def __init__(self, mainClass, configClass, preloadClass, **kwargs):
+	def __init__(self, mainClass, configClass, preloadClass, infoClass, **kwargs):
 		super().__init__(**kwargs)
 		self.mainClass = mainClass
 		self.configClass = configClass
 		self.preloadClass = preloadClass
+		self.infoClass = infoClass
 
 		self.Page_Main()
 
 	def Page_Main(self):
 		bg = Image(texture=self.preloadClass.returnPreloadedAsset('bg_inara.png'), pos=(118,81), size_hint=(None,None), size=(501,287), id=self.id)
-		self.mainClass.add_widget(bg)
+		self.add_widget(bg)
 
 		self.DrawBackground()
 
@@ -44,30 +47,33 @@ class Page_Inara(FloatLayout):
 		# ###
 
 		#DEBUG
-		Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'fleet', (212,155), self.Goto_FleetPage, foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
-		print('debug')
-		return
+		#Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'fleet', (212,155), self.Goto_FleetPage, foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
+		#print('debug')
+		#return
 
-		#Loading up INARA API Works
-		lbl_info = Label(text='Loading...', pos=(204,288), size=(577,120), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='64sp', id=self.id, halign='center')
-		self.mainClass.add_widget(lbl_info)
+		if self.infoClass.cmdr_name == None and self.infoClass.cmdr_combatrank == None:
+			#Loading up INARA API Works
+			lbl_info = Label(text='Loading...', pos=(204,288), size=(577,120), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='64sp', id=self.id, halign='center')
+			self.add_widget(lbl_info)
 		
-		x = API_Inara(self.configClass)
-		output = None
+			x = API_Inara(self.configClass, self.infoClass)
+			output = None
 
-		if x.errormsg != None:
-			lbl_info.text = x.errormsg
-			return # Stop here if something went wrong, like wrong api key
+			if x.errormsg != None:
+				lbl_info.text = x.errormsg
+				return # Stop here if something went wrong, like wrong api key
 		
-		Sounds.PlaySound(preloadClass, 'establishing_datalink.wav')
-		self.mainClass.remove_widget(lbl_info)
-		# ###
+			Sounds.PlaySound(self.preloadClass, 'establishing_datalink.wav')
+			self.remove_widget(lbl_info)
+			# ###
+		elif self.configClass.debug:
+			Logger.info('Page_Inara : Information already retrieved, using old')
 
 		#Add Rankings Combat Icons and Labels
-		Buttons.Inara_RankButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'combat', x.cmdr_combatrank, (200,279), ColorConversion.RGBA_to_Float(181,0,6))
-		Buttons.Inara_RankButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'trade', x.cmdr_traderank, (348,279), ColorConversion.RGBA_to_Float(254,154,0))
-		Buttons.Inara_RankButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'exploration', x.cmdr_explorationrank, (495,279), ColorConversion.RGBA_to_Float(153,205,255))
-		Buttons.Inara_RankButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'cqc', x.cmdr_cqcrank, (642,279), ColorConversion.RGBA_to_Float(237,26,33))
+		Buttons.Inara_RankButton(self, self.configClass, self.preloadClass, self.id, 'combat', self.infoClass.cmdr_combatrank, (200,279), ColorConversion.RGBA_to_Float(181,0,6))
+		Buttons.Inara_RankButton(self, self.configClass, self.preloadClass, self.id, 'trade', self.infoClass.cmdr_traderank, (348,279), ColorConversion.RGBA_to_Float(254,154,0))
+		Buttons.Inara_RankButton(self, self.configClass, self.preloadClass, self.id, 'exploration', self.infoClass.cmdr_explorationrank, (495,279), ColorConversion.RGBA_to_Float(153,205,255))
+		Buttons.Inara_RankButton(self, self.configClass, self.preloadClass, self.id, 'cqc', self.infoClass.cmdr_cqcrank, (642,279), ColorConversion.RGBA_to_Float(237,26,33))
 
 		#Buttons
 		Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'fleet', (212,155), self.Goto_FleetPage, foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
@@ -77,7 +83,7 @@ class Page_Inara(FloatLayout):
 
 	direction = 'r'
 	def timer(self):
-		#kill timer if animation not active
+		#kill timer if page not active
 		active = False
 		for x in range(5):
 			for child in self.mainClass.children:
@@ -87,6 +93,8 @@ class Page_Inara(FloatLayout):
 
 		if active == False:
 			self.hexagon_timer.cancel()
+			if self.configClass.debug:
+				Logger.info('Page_Inara : Animation timer stopped')
 		# ###
 
 		acc = self.hexagon.pos
@@ -103,7 +111,7 @@ class Page_Inara(FloatLayout):
 	def DrawBackground(self):
 		rect0 = Label(pos=(118,371), size=(78,60), size_hint=(None,None), id=self.id)
 		rect0_col = ColorConversion.RGBA_to_Float(156,160,255)
-		with rect0.canvas.after:
+		with rect0.canvas.before:
 			Color(rect0_col[0],rect0_col[1],rect0_col[2],rect0_col[3])
 			Rectangle(pos=rect0.pos, size=rect0.size)
 		
@@ -152,7 +160,7 @@ class Page_Inara(FloatLayout):
 		
 		elements =[rect0,rect1,rect2,rect3,rect4,rect5,rect6,rect7]
 		for x in elements:
-			self.mainClass.add_widget(x)
+			self.add_widget(x)
 
 	def Goto_FleetPage(self, instance):
 		#Clear page of Main
