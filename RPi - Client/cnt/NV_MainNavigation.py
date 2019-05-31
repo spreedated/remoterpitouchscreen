@@ -8,15 +8,15 @@ from mod.Color import ColorConversion
 from mod.Controls import *
 from mod.Sound import Sounds
 from mod.RemovesClears import RemovesClears
-from cnt.Inara import *
+from cnt.PG_Inara import *
 from cnt.PG_Exit import *
 from cnt.PG_Welcome import *
 from cnt.Elite_Limpets import *
 from cnt.Elite_PIPS import *
 from cnt.Fleet import *
 
-class LeftNavigation(FloatLayout):
-	id='btnLeftNavigation'
+class NV_MainNavigation(FloatLayout):
+	id='NV_MainNavigation'
 
 	mainClass = None
 	configClass = None
@@ -49,7 +49,7 @@ class LeftNavigation(FloatLayout):
 		if page == 'inara':
 			self.TopStatusBar.changeCaption('inara')
 			Logger.info('PageFunction : Pageswitch - Inara')
-			self.mainClass.add_widget(Page_Inara(self.mainClass, self.configClass, self.preloadClass, self.infoClass))
+			self.mainClass.add_widget(PG_Inara(self.mainClass, self.configClass, self.preloadClass, self.infoClass))
 		if page == 'welcome':
 			self.TopStatusBar.changeCaption('elite lcars')
 			Logger.info('PageFunction : Pageswitch - welcome')

@@ -69,9 +69,10 @@ from mod.Controls import *
 from mod.RemovesClears import RemovesClears
 from mod.Information import DynamicInformation
 from cnt.LY_Background import *
-from cnt.StatusBars import *
-from cnt.Navigation import *
+from cnt.LY_StatusBars import *
+from cnt.NV_MainNavigation import *
 from cnt.PG_Welcome import *
+import mod.Information as ApplicationInfo
 
 
 if sys.version_info[0] != 3:
@@ -84,31 +85,28 @@ Info_LCARS = DynamicInformation()
 
 class MainLayout(FloatLayout):
 	shipinstance = None
-	TopStatusBar = None
-	BottomStatusBar = None
+	LY_TopStatusBar = None
+	LY_BottomStatusBar = None
 
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		#Background
 		self.add_widget(LY_Background())
 		#StatusBars
-		self.TopStatusBar = TopStatusBar(self)
-		self.add_widget(self.TopStatusBar)
-		self.BottomStatusBar = BottomStatusBar(self)		
-		self.add_widget(self.BottomStatusBar)
+		self.LY_TopStatusBar = LY_TopStatusBar()
+		self.add_widget(self.LY_TopStatusBar)
+		self.LY_BottomStatusBar = LY_BottomStatusBar()		
+		self.add_widget(self.LY_BottomStatusBar)
 		#Main Navigation
-		self.add_widget(LeftNavigation(self, Config_LCARS, Preload_LCARS, self.TopStatusBar, Info_LCARS))
+		self.add_widget(NV_MainNavigation(self, Config_LCARS, Preload_LCARS, self.LY_TopStatusBar, Info_LCARS))
 		#Welcome Page
 		self.add_widget(PG_Welcome(Config_LCARS, Preload_LCARS))
 
-		#print(DynamicInformation.cmdr_name)
-
-		for child in self.children:
-			print(child.id)
+		Logger.info('INIT : Startup sequences finsihed - ' + ApplicationInfo.appFullName)
 
 class MainApp(App):
 	def build(self):
-		self.title = 'LCARS'
+		self.title = ApplicationInfo.appFullName
 		return MainLayout()
 
 	def on_stop(self):
