@@ -68,10 +68,10 @@ from mod.Sound import Sounds
 from mod.Controls import *
 from mod.RemovesClears import RemovesClears
 from mod.Information import DynamicInformation
-from cnt.Background import *
+from cnt.LY_Background import *
 from cnt.StatusBars import *
 from cnt.Navigation import *
-from cnt.Welcome import *
+from cnt.PG_Welcome import *
 
 
 if sys.version_info[0] != 3:
@@ -90,7 +90,7 @@ class MainLayout(FloatLayout):
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		#Background
-		self.add_widget(MainBackground(self))
+		self.add_widget(LY_Background())
 		#StatusBars
 		self.TopStatusBar = TopStatusBar(self)
 		self.add_widget(self.TopStatusBar)
@@ -98,10 +98,13 @@ class MainLayout(FloatLayout):
 		self.add_widget(self.BottomStatusBar)
 		#Main Navigation
 		self.add_widget(LeftNavigation(self, Config_LCARS, Preload_LCARS, self.TopStatusBar, Info_LCARS))
-		#First Page
-		self.add_widget(WelcomePage(self, Config_LCARS, Preload_LCARS))
+		#Welcome Page
+		self.add_widget(PG_Welcome(Config_LCARS, Preload_LCARS))
 
-		print(DynamicInformation.cmdr_name)
+		#print(DynamicInformation.cmdr_name)
+
+		for child in self.children:
+			print(child.id)
 
 class MainApp(App):
 	def build(self):

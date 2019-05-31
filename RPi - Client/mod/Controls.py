@@ -1,3 +1,4 @@
+from kivy.lang import Builder
 from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.behaviors import ButtonBehavior
@@ -7,6 +8,17 @@ from kivy.properties import StringProperty
 from kivy.graphics.instructions import InstructionGroup
 from mod.Color import ColorConversion
 from mod.Sound import Sounds
+
+Builder.load_string("""
+<LCARS_Label@Label>:
+	font_name: 'fnt/lcarsgtj3.ttf'
+	font_size: '64sp'
+	color: 0.99,0.61,0,1
+	markup: True
+	size_hint: None,None
+<LCARS_CanvasLabel@Label>:
+	size_hint: None,None
+""")
 
 class LCARS_LabelButton(ButtonBehavior, Label):
 	def on_press(self):
@@ -19,6 +31,24 @@ class LCARS_ImageButton(ButtonBehavior, Image):
 class Buttons():
 	# Left Navigation
 	leftPositions = [(11,383),(11,336),(11,290),(11,243),(11,196),(11,150),(11,103),(11,56)]
+
+	def RoundedButton(self, configClass, preloadClass, id, labeltext, action, position, width, textsize='48sp', backgroundColor=(0.71,0,0.02,1), foregroundColor=(1,1,1,1), clickSound=True, soundFile=None):
+		btn_center = LCARS_LabelButton(pos=(position[0],position[1]), size=(width,45), size_hint=(None,None), id=id)
+		with btn_center.canvas.before:
+			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
+			RoundedRectangle(pos=btn_center.pos, size=btn_center.size, radius=[23,23,23,23])
+		btn_lbl = LCARS_LabelButton(text=labeltext, pos=(position[0],position[1]), size=(width,45), size_hint=(None,None), color=(foregroundColor[0],foregroundColor[1],foregroundColor[2],foregroundColor[3]), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size=textsize, id=id, halign='center')
+		btn_center.add_widget(btn_lbl)
+
+		elements = [btn_center, btn_lbl]
+		for x in elements:
+			if action != None:
+				x.bind(on_press=action)
+			if clickSound and configClass.clicksounds == 1 and soundFile == None:
+				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass))
+			if soundFile != None:
+				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, soundFile))
+		self.add_widget(btn_center)
 
 	def Button_LeftNav(self, configClass, preloadClass, btnText, btnEnumPosition, btnEnumColor, id, btnClickSounds=0, action=None):
 		btn = LCARS_LabelButton(pos=Buttons.leftPositions[btnEnumPosition], size=(96,40), size_hint=(None,None), id=id)
@@ -60,24 +90,6 @@ class Buttons():
 			if soundFile != None:
 				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, soundFile))
 		self.add_widget(btn)
-
-	def RoundedButton(self, configClass, preloadClass, id, labeltext, action, position, width, textsize='48sp', backgroundColor=(0.71,0,0.02,1), foregroundColor=(1,1,1,1), clickSound=True, soundFile=None):
-		btn_center = LCARS_LabelButton(pos=(position[0],position[1]), size=(width,45), size_hint=(None,None), id=id)
-		with btn_center.canvas.before:
-			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
-			RoundedRectangle(pos=btn_center.pos, size=btn_center.size, radius=[23,23,23,23])
-		btn_lbl = LCARS_LabelButton(text=labeltext, pos=(position[0],position[1]), size=(width,45), size_hint=(None,None), color=(foregroundColor[0],foregroundColor[1],foregroundColor[2],foregroundColor[3]), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size=textsize, id=id, halign='center')
-		btn_center.add_widget(btn_lbl)
-
-		elements = [btn_center, btn_lbl]
-		for x in elements:
-			if action != None:
-				x.bind(on_press=action)
-			if clickSound and configClass.clicksounds == 1 and soundFile == None:
-				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass))
-			if soundFile != None:
-				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, soundFile))
-		self.add_widget(btn_center)
 
 	def RoundedButtonSquare(self, configClass, preloadClass, id, labeltext, action, position, width, height, iconImage, textsize='48sp', backgroundColor=(0.71,0,0.02,1), foregroundColor=(0,0,0,1), clickSound=True, soundFile=None):	
 		btn_Center = LCARS_LabelButton(pos=(position[0],position[1]), size=(width, height), size_hint=(None,None), id=id)

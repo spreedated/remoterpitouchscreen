@@ -5,7 +5,7 @@ from kivy.uix.videoplayer import VideoPlayer
 class RemovesClears():
 
 	def clear_pages(className):
-		exclusions =['mainBackground','btnLeftNavigation', 'BottomStatusBar','TopStatusBar']
+		exclusions =['LY_Background','btnLeftNavigation', 'BottomStatusBar','TopStatusBar']
 		for x in range(8):
 			for child in className.children:
 				if child.id != None:

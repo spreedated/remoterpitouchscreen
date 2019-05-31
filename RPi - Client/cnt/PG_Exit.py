@@ -1,4 +1,5 @@
 from kivy.app import App
+from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
@@ -7,8 +8,18 @@ from kivy.logger import Logger
 from mod.Controls import *
 from mod.RemovesClears import RemovesClears
 
-class ExitPage(FloatLayout):
-	id='Exit'
+Builder.load_string("""
+<PG_Exit>:
+	LCARS_Label:
+		text: 'COMPUTER CORE\\nSHUTDOWN'
+		pos: 118,251
+		size: 665,166
+		halign: 'center'
+		font_size: '96sp'
+""")
+
+class PG_Exit(FloatLayout):
+	id='PG_Exit'
 
 	mainClass = None
 	configClass = None
@@ -20,9 +31,6 @@ class ExitPage(FloatLayout):
 		self.mainClass = mainClass
 		self.configClass = configClass
 		self.preloadClass = preloadClass
-
-		lbl_shutdown = Label(text='COMPUTER CORE\nSHUTDOWN', pos=(282,256), size=(325,152), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='96sp', id=self.id, halign='center')
-		self.add_widget(lbl_shutdown)
 
 		Buttons.RoundedButton(self.mainClass, self.configClass, self.preloadClass, self.id + '_auth', '--- AUTHORIZE ---', self.exit_page1, (239,167), 411, soundFile='beep.wav')
 

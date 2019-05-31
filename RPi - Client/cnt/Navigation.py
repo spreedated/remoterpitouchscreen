@@ -9,8 +9,8 @@ from mod.Controls import *
 from mod.Sound import Sounds
 from mod.RemovesClears import RemovesClears
 from cnt.Inara import *
-from cnt.Exit import *
-from cnt.Welcome import *
+from cnt.PG_Exit import *
+from cnt.PG_Welcome import *
 from cnt.Elite_Limpets import *
 from cnt.Elite_PIPS import *
 from cnt.Fleet import *
@@ -45,7 +45,7 @@ class LeftNavigation(FloatLayout):
 		if page == 'exit':
 			self.TopStatusBar.changeCaption('shutdown')
 			Logger.info('PageFunction : Pageswitch - Shutdown')
-			self.mainClass.add_widget(ExitPage(self.mainClass, self.configClass, self.preloadClass))
+			self.mainClass.add_widget(PG_Exit(self.mainClass, self.configClass, self.preloadClass))
 		if page == 'inara':
 			self.TopStatusBar.changeCaption('inara')
 			Logger.info('PageFunction : Pageswitch - Inara')
@@ -53,7 +53,7 @@ class LeftNavigation(FloatLayout):
 		if page == 'welcome':
 			self.TopStatusBar.changeCaption('elite lcars')
 			Logger.info('PageFunction : Pageswitch - welcome')
-			self.mainClass.add_widget(WelcomePage(self.mainClass, self.configClass, self.preloadClass))
+			self.mainClass.add_widget(PG_Welcome(self.configClass, self.preloadClass))
 		if page == 'limpets':
 			self.TopStatusBar.changeCaption('elite limpets')
 			Logger.info('PageFunction : Pageswitch - elite limpets')
