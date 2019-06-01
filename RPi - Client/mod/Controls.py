@@ -21,12 +21,10 @@ Builder.load_string("""
 """)
 
 class LCARS_LabelButton(ButtonBehavior, Label):
-	def on_press(self):
-		pass
+	pass
 
 class LCARS_ImageButton(ButtonBehavior, Image):
-	def on_press(self):
-		pass
+	pass
 
 class Buttons():
 	# Left Navigation

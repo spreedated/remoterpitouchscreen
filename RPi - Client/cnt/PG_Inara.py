@@ -1,5 +1,6 @@
 import datetime
 import time
+from kivy.lang import Builder
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.image import Image
@@ -12,7 +13,7 @@ from mod.API_Works import API_Inara
 from mod.Controls import *
 from mod.Sound import Sounds
 from mod.RemovesClears import RemovesClears
-from kivy.lang import Builder
+from cnt.PG_Inara_Fleet import *
 
 Builder.load_string("""
 <PG_Inara>:
@@ -128,11 +129,7 @@ class PG_Inara(FloatLayout):
 
 		self.ids['background'].texture = preloadClass.returnPreloadedAsset('bg_inara.png')
 		self.hexagon.texture = preloadClass.returnPreloadedAsset('inara_hexagon.png')
-		print(self.ids)
 
-		self.Page_Main()
-
-	def Page_Main(self):
 		#animation
 		self.hexagon = Image(texture=self.preloadClass.returnPreloadedAsset('inara_hexagon.png'), pos=(465,236), size_hint=(None,None), size=(40,23), id=self.id + '_hexagon')
 		self.mainClass.add_widget(self.hexagon)
@@ -141,9 +138,9 @@ class PG_Inara(FloatLayout):
 		# ###
 
 		#DEBUG
-		#Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'fleet', (212,155), self.Goto_FleetPage, foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
-		#print('debug')
-		#return
+		if len(self.configClass.inara_username) >= 3:
+			Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'fleet', (212,155), self.Goto_FleetPage, foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
+		return
 
 		if self.infoClass.cmdr_name == None and self.infoClass.cmdr_combatrank == None:
 			#Loading up INARA API Works
@@ -170,7 +167,8 @@ class PG_Inara(FloatLayout):
 		Buttons.Inara_RankButton(self, self.configClass, self.preloadClass, self.id, 'cqc', self.infoClass.cmdr_cqcrank, (642,279), ColorConversion.RGBA_to_Float(237,26,33))
 
 		#Buttons
-		Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'fleet', (212,155), self.Goto_FleetPage, foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
+		if len(self.configClass.inara_username) >= 3:
+			Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'fleet', (212,155), self.Goto_FleetPage, foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
 
 	def animation(self):
 		self.hexagon_timer = Clock.schedule_interval(lambda a: self.timer(), 0.02)
@@ -205,6 +203,7 @@ class PG_Inara(FloatLayout):
 	def Goto_FleetPage(self, instance):
 		#Clear page of Main
 		RemovesClears.remove_mywidget(self.mainClass, self.id)
+		self.mainClass.add_widget(PG_Inara_Fleet(self.configClass, self.preloadClass, self.infoClass))
 
 	def Goto_Back_MainWindow(self):
 		self.Page_Main()

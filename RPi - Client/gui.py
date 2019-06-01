@@ -47,21 +47,9 @@ Config.write()
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.clock import Clock
-from kivy.graphics import Color, Rectangle, RoundedRectangle
-#from kivy.lang import Builder
 from kivy.logger import Logger
-from kivy.uix.image import Image
-from kivy.uix.label import Label
-from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
-#from kivy.uix.relativelayout import RelativeLayout
-#from kivy.uix.textinput import TextInput
-from kivy.uix.video import Video
-from kivy.core.video import VideoBase
-from kivy.uix.videoplayer import VideoPlayer
-from kivy.uix.scrollview import ScrollView
 from mod.Color import ColorConversion
-from mod.Inara_Ships import Ships
 from mod.Configuration import Configuration
 from mod.Preload import PreloadAssets
 from mod.Sound import Sounds

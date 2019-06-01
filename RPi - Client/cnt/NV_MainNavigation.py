@@ -13,7 +13,6 @@ from cnt.PG_Exit import *
 from cnt.PG_Welcome import *
 from cnt.Elite_Limpets import *
 from cnt.Elite_PIPS import *
-from cnt.Fleet import *
 
 class NV_MainNavigation(FloatLayout):
 	id='NV_MainNavigation'
@@ -62,10 +61,6 @@ class NV_MainNavigation(FloatLayout):
 			self.TopStatusBar.changeCaption('elite pips')
 			Logger.info('PageFunction : Pageswitch - elite pips')
 			self.mainClass.add_widget(ElitePIPSPage(self.mainClass, self.configClass, self.preloadClass))
-		if page == 'fleet':
-			self.TopStatusBar.changeCaption('cmdr fleet')
-			Logger.info('PageFunction : Pageswitch - cmdr fleet')
-			self.mainClass.add_widget(Fleet(self.mainClass, self.configClass, self.preloadClass))
 		if page == 'test':
 			self.TopStatusBar.changeCaption('test')
 			Logger.info('PageFunction : Pageswitch - test')

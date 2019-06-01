@@ -1,19 +1,60 @@
 import requests
 import lxml.html
+from kivy.uix.image import Image
+from kivy.uix.label import Label
+from kivy.graphics import Color, Rectangle, RoundedRectangle
 from scrapy.selector import Selector
-from scrapy.linkextractors import LinkExtractor
+from kivy.uix.scrollview import ScrollView
+from kivy.properties import ObjectProperty
+from kivy.lang import Builder
+from kivy.logger import Logger
+from mod.Color import ColorConversion
 
-class Ships():
+Builder.load_string("""
+<PG_Inara_Fleet>:
+	stacky: stacky
+	size_hint: None,None
+	size: 665,383
+	pos: 118,49
+	BoxLayout:
+		pos: 0,0
+		size: 665,0
+		size_hint: None,None
+		spacing: 10
+		orientation: 'vertical'
+		id: stacky
+""")
+
+class PG_Inara_Fleet(ScrollView):
+	id='PG_Inara_Fleet'
+	stacky = ObjectProperty()
+
 	fleetdetails = [] # [0]name - [1]id - [2]type - [3]value_str - [4]value_int - [5]dock - [6]linktodetails
 	fleetcount = 0
 	fleetvalue = 0
 	status = None # If everything went okay
 
-	def __init__(self, configinstance, *args, **kwargs):
+	def __init__(self, configInstance, preloadClass, infoClass, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		
-		self.Inara_ProcessFleet(self.Inara_GetFleet(configinstance))
+		self.Inara_ProcessFleet(self.Inara_GetFleet(configInstance))
 
+		stacky_y = 0
+		for ship in self.fleetdetails:
+			print(ship)
+			col = ColorConversion.RGBA_to_Float(0,168,89)
+			x = Label(size=(640,177))
+			with x.canvas.after:
+				Color(col[0],col[1],col[2],col[3])
+				RoundedRectangle(pos=x.pos, size=x.size, radius=(42,42,42,42))
+			self.stacky.add_widget(x)
+			stacky_y += (x.size[1] + 10)
+
+		self.stacky.size = (self.stacky.size[0], stacky_y)
+
+		Logger.info('PageFunction : Pageswitch - PG_Inara_Fleet')
+
+	# Back-End
 	def Inara_GetFleet(self, configinstance):
 		session = self.cas_login(configinstance.inara_username, configinstance.inara_password)
 		if session == 'timeout':
@@ -101,7 +142,3 @@ class Ships():
 
 			self.fleetdetails.append((shipname, shipid, shiptype, shipvalue, shipvalue_int, shipdock, shipdetaillink))
 			self.fleetcount+=1
-
-#x = Ships()
-
-#print(x.fleetdetails[3][2])
