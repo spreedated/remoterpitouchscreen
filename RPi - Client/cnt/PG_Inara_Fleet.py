@@ -12,22 +12,22 @@ from mod.Color import ColorConversion
 
 Builder.load_string("""
 <PG_Inara_Fleet>:
-	stacky: stacky
+	floaty: floaty
 	size_hint: None,None
 	size: 665,383
 	pos: 118,49
-	BoxLayout:
+	FloatLayout:
 		pos: 0,0
 		size: 665,0
 		size_hint: None,None
 		spacing: 10
 		orientation: 'vertical'
-		id: stacky
+		id: floaty
 """)
 
 class PG_Inara_Fleet(ScrollView):
 	id='PG_Inara_Fleet'
-	stacky = ObjectProperty()
+	floaty = ObjectProperty()
 
 	fleetdetails = [] # [0]name - [1]id - [2]type - [3]value_str - [4]value_int - [5]dock - [6]linktodetails
 	fleetcount = 0
@@ -37,20 +37,96 @@ class PG_Inara_Fleet(ScrollView):
 	def __init__(self, configInstance, preloadClass, infoClass, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		
+		#Reset
+		self.fleetdetails = []
+		self.fleetcount = 0
+		self.fleetvalue = 0
+		status = None
+
 		self.Inara_ProcessFleet(self.Inara_GetFleet(configInstance))
 
-		stacky_y = 0
+		#Build Floaty (FloatLayout inside ScrollView)
+		self.fleetdetails.sort(reverse=True)
+		
+		floaty_y = 0
+		next_pos_y = 0
+		ships_images = [
+			('Diamondback Explorer','dbx2.png'),
+			('Adder','adder2.png'),
+			('Anaconda','anaconda2.png'),
+			('Asp Explorer','aspx2.png'),
+			('Fer-De-Lance','fdl2.png'),
+			('Hauler','hauler2.png'),
+			('Imperial Clipper','imp_clipper2.png'),
+			('Imperial Courier','imp_courier2.png'),
+			('Imperial Cutter','imp_cutter2.png'),
+			('Imperial Eagle','imp_eagle2.png'),
+			('Keelback','keelback2.png'),
+			('Orca','orca2.png'),
+			('Python','python2.png'),
+			('Sidewinder','side2.png'),
+			('Type-6 Transporter','type62.png'),
+			('Type-7 Transporter','type72.png'),
+			('Type-9 Transporter','type92.png'),
+			('Viper MK III','vipermk32.png'),
+			('Viper MK IV','vipermk42.png'),
+			('Vulture','vulture2.png'),
+				  ]
 		for ship in self.fleetdetails:
-			print(ship)
-			col = ColorConversion.RGBA_to_Float(0,168,89)
-			x = Label(size=(640,177))
+			#print(ship)
+			x = Label(size=(640,177), size_hint=(None,None), pos=(0,next_pos_y))
 			with x.canvas.after:
-				Color(col[0],col[1],col[2],col[3])
+				Color(1,1,1,0.2)
 				RoundedRectangle(pos=x.pos, size=x.size, radius=(42,42,42,42))
-			self.stacky.add_widget(x)
-			stacky_y += (x.size[1] + 10)
+			
+			#Name
+			x_Name_LBL = Label(text='Name', markup=True, color=(0.4,0.4,0.4,1), pos=(x.pos[0]+148, x.pos[1]+160), size=(250,33), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='18sp', id=self.id, halign='left', text_size=(250,50), shorten_from='right', split_str=' ', shorten=True)
+			x.add_widget(x_Name_LBL)
+			x_Name = Label(text=ship[0], markup=True, color=(0.8,0.8,0.8,1), pos=(x.pos[0]+146, x.pos[1]+127), size=(240,33), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='36sp', id=self.id, halign='left', text_size=(240,50), shorten_from='right', split_str=' ', shorten=True)
+			x.add_widget(x_Name)
 
-		self.stacky.size = (self.stacky.size[0], stacky_y)
+			#ID
+			x_ID_LBL = Label(text='ID', markup=True, color=(0.4,0.4,0.4,1), pos=(x.pos[0]+148, x.pos[1]+105), size=(250,33), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='18sp', id=self.id, halign='left', text_size=(250,50), shorten_from='right', split_str=' ', shorten=True)
+			x.add_widget(x_ID_LBL)
+			x_ID = Label(text=ship[1], markup=True, color=(0.8,0.8,0.8,1), pos=(x.pos[0]+146, x.pos[1]+72), size=(80,33), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='36sp', id=self.id, halign='left', text_size=(80,50), shorten_from='right', split_str=' ', shorten=True)
+			x.add_widget(x_ID)
+
+			#Type
+			x_Type_LBL = Label(text=ship[2], markup=True, color=(0.4,0.4,0.4,1), pos=(x.pos[0]+10, x.pos[1]+145), size=(130,20), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='18sp', id=self.id, halign='center', text_size=(130,20), shorten_from='right', split_str=' ', shorten=True)
+			#with x_Type_LBL.canvas.before:
+			#	Color(1,1,1,1)
+			#	Rectangle(pos=x_Type_LBL.pos, size=x_Type_LBL.size)
+			x.add_widget(x_Type_LBL)
+
+			#Value Cr
+			x_Value_LBL = Label(text='Name', markup=True, color=(0.4,0.4,0.4,1), pos=(x.pos[0]+398, x.pos[1]+160), size=(230,33), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='18sp', id=self.id, halign='left', text_size=(230,50), shorten_from='right', split_str=' ', shorten=True)
+			x.add_widget(x_Value_LBL)
+			x_Value = Label(text=ship[3], markup=True, color=(0.8,0.8,0.8,1), pos=(x.pos[0]+398, x.pos[1]+127), size=(230,33), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='36sp', id=self.id, halign='left', text_size=(230,50), shorten_from='right', split_str=' ', shorten=True)
+			x.add_widget(x_Value)
+
+			#Dock
+			x_Dock_LBL = Label(text='Current Dock', markup=True, color=(0.4,0.4,0.4,1), pos=(x.pos[0]+148, x.pos[1]+43), size=(100,33), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='18sp', id=self.id, halign='left', text_size=(100,50), shorten_from='right', split_str=' ', shorten=True)
+			x.add_widget(x_Dock_LBL)
+			x_Dock = Label(text=ship[5], markup=True, color=(0.8,0.8,0.8,1), pos=(x.pos[0]+146, x.pos[1]+10), size=(480,33), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='36sp', id=self.id, halign='left', text_size=(480,50), shorten_from='right', split_str=' ', shorten=True)
+			x.add_widget(x_Dock)
+
+			#Picture
+			img_string = None
+			for xb in range(len(ships_images)):
+				if str(ship[2]).lower() in str(ships_images[xb][0]).lower():
+					img_string = ships_images[xb][1]
+
+			if img_string != None:
+				x_Picture = Image(source='img/edassets/ships/'+img_string,pos=(x.pos[0]+10, x.pos[1]+5), size=(125,142), size_hint=(None,None), id=self.id)
+				x.add_widget(x_Picture)
+
+			next_pos_y += 187
+			self.floaty.add_widget(x)
+			floaty_y += (x.size[1] + 10)
+				
+
+		#set size of floatlayout
+		self.floaty.size = (self.floaty.size[0], floaty_y)
 
 		Logger.info('PageFunction : Pageswitch - PG_Inara_Fleet')
 
