@@ -3,6 +3,7 @@ import json
 import requests
 import datetime
 from kivy.logger import Logger
+import mod.Information as ApplicationInfo
 
 class API_Inara():
 	configClass = None
@@ -46,13 +47,13 @@ class API_Inara():
 			#Get CMDR Ranks
 			for element in json_resp['events'][0]['eventData']['commanderRanksPilot']:
 				if element['rankName'] == 'combat':
-					self.infoClass.cmdr_combatrank = self.infoClass.CombatRanks[element['rankValue']]
+					self.infoClass.cmdr_combatrank = ApplicationInfo.CombatRanks[element['rankValue']]
 				if element['rankName'] == 'trade':
-					self.infoClass.cmdr_traderank = self.infoClass.TradeRanks[element['rankValue']]
+					self.infoClass.cmdr_traderank = ApplicationInfo.TradeRanks[element['rankValue']]
 				if element['rankName'] == 'exploration':
-					self.infoClass.cmdr_explorationrank = self.infoClass.ExplorationRanks[element['rankValue']]
+					self.infoClass.cmdr_explorationrank = ApplicationInfo.ExplorationRanks[element['rankValue']]
 				if element['rankName'] == 'cqc':
-					self.infoClass.cmdr_cqcrank = self.infoClass.CQCRanks[element['rankValue']]
+					self.infoClass.cmdr_cqcrank = ApplicationInfo.CQCRanks[element['rankValue']]
 			#Get CMDR Name
 			self.infoClass.cmdr_name = json_resp['header']['eventData']['userName']
 			Logger.info('API Inara : CMDR Name retrieved ['+self.infoClass.cmdr_name+']')

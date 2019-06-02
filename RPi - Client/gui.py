@@ -47,31 +47,20 @@ Config.write()
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.clock import Clock
-from kivy.graphics import Color, Rectangle, RoundedRectangle
-#from kivy.lang import Builder
 from kivy.logger import Logger
-from kivy.uix.image import Image
-from kivy.uix.label import Label
-from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
-#from kivy.uix.relativelayout import RelativeLayout
-#from kivy.uix.textinput import TextInput
-from kivy.uix.video import Video
-from kivy.core.video import VideoBase
-from kivy.uix.videoplayer import VideoPlayer
-from kivy.uix.scrollview import ScrollView
 from mod.Color import ColorConversion
-from mod.Inara_Ships import Ships
 from mod.Configuration import Configuration
 from mod.Preload import PreloadAssets
 from mod.Sound import Sounds
 from mod.Controls import *
 from mod.RemovesClears import RemovesClears
 from mod.Information import DynamicInformation
-from cnt.Background import *
-from cnt.StatusBars import *
-from cnt.Navigation import *
-from cnt.Welcome import *
+from cnt.LY_Background import *
+from cnt.LY_StatusBars import *
+from cnt.NV_MainNavigation import *
+from cnt.PG_Welcome import *
+import mod.Information as ApplicationInfo
 
 
 if sys.version_info[0] != 3:
@@ -84,28 +73,28 @@ Info_LCARS = DynamicInformation()
 
 class MainLayout(FloatLayout):
 	shipinstance = None
-	TopStatusBar = None
-	BottomStatusBar = None
+	LY_TopStatusBar = None
+	LY_BottomStatusBar = None
 
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		#Background
-		self.add_widget(MainBackground(self))
+		self.add_widget(LY_Background())
 		#StatusBars
-		self.TopStatusBar = TopStatusBar(self)
-		self.add_widget(self.TopStatusBar)
-		self.BottomStatusBar = BottomStatusBar(self)		
-		self.add_widget(self.BottomStatusBar)
+		self.LY_TopStatusBar = LY_TopStatusBar()
+		self.add_widget(self.LY_TopStatusBar)
+		self.LY_BottomStatusBar = LY_BottomStatusBar()		
+		self.add_widget(self.LY_BottomStatusBar)
 		#Main Navigation
-		self.add_widget(LeftNavigation(self, Config_LCARS, Preload_LCARS, self.TopStatusBar, Info_LCARS))
-		#First Page
-		self.add_widget(WelcomePage(self, Config_LCARS, Preload_LCARS))
+		self.add_widget(NV_MainNavigation(self, Config_LCARS, Preload_LCARS, self.LY_TopStatusBar, Info_LCARS))
+		#Welcome Page
+		self.add_widget(PG_Welcome(Config_LCARS, Preload_LCARS))
 
-		print(DynamicInformation.cmdr_name)
+		Logger.info('INIT : Startup sequences finsihed - ' + ApplicationInfo.appFullName)
 
 class MainApp(App):
 	def build(self):
-		self.title = 'LCARS'
+		self.title = ApplicationInfo.appFullName
 		return MainLayout()
 
 	def on_stop(self):
