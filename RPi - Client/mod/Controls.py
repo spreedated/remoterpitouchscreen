@@ -16,6 +16,12 @@ Builder.load_string("""
 	color: 0.99,0.61,0,1
 	markup: True
 	size_hint: None,None
+<LCARS_ButtonLabel@ButtonBehavior+Label>:
+	font_name: 'fnt/lcarsgtj3.ttf'
+	font_size: '36sp'
+	color: 0.99,0.61,0,1
+	markup: True
+	size_hint: None,None
 <LCARS_CanvasLabel@Label>:
 	size_hint: None,None
 """)
@@ -27,7 +33,6 @@ class LCARS_ImageButton(ButtonBehavior, Image):
 	pass
 
 class Buttons():
-	# Left Navigation
 	leftPositions = [(11,383),(11,336),(11,290),(11,243),(11,196),(11,150),(11,103),(11,56)]
 
 	def RoundedButton(self, configClass, preloadClass, id, labeltext, action, position, width, textsize='48sp', backgroundColor=(0.71,0,0.02,1), foregroundColor=(1,1,1,1), clickSound=True, soundFile=None):
@@ -48,6 +53,7 @@ class Buttons():
 				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, soundFile))
 		self.add_widget(btn_center)
 
+	# Left Navigation
 	def Button_LeftNav(self, configClass, preloadClass, btnText, btnEnumPosition, btnEnumColor, id, btnClickSounds=0, action=None):
 		btn = LCARS_LabelButton(pos=Buttons.leftPositions[btnEnumPosition], size=(96,40), size_hint=(None,None), id=id)
 		with btn.canvas.before:
@@ -166,3 +172,20 @@ class Buttons():
 			if soundFile != None:
 				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, soundFile))
 			mainClass.add_widget(x)
+
+	def RoundedSquareButton(self, configClass, preloadClass, id, labeltext, position, widthheight, action=None, backgroundColor=(1,1,1,0.2), foregroundColor=(1,1,1,1), clickSound=True, soundFile=None):
+		btn = LCARS_LabelButton(pos=position, size=(widthheight,widthheight), size_hint=(None,None))
+		with btn.canvas.after:
+			Color(1,1,1,0.2)
+			RoundedRectangle(pos=btn.pos, size=btn.size, radius=(15,15,15,15))
+		btn_txt = Label(pos=position, size=(widthheight,widthheight), size_hint=(None,None), text=labeltext, font_name='fnt/lcarsgtj3.ttf', font_size='36sp', color=(1,1,1,1), halign='center')
+
+		elements = [btn,btn_txt]
+		for x in elements:
+			if action != None:
+				x.bind(on_press=action)
+			if clickSound and configClass.clicksounds == 1 and soundFile == None:
+				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass))
+			if soundFile != None:
+				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, soundFile))
+			self.add_widget(x)

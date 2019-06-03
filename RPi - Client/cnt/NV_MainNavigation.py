@@ -13,6 +13,7 @@ from cnt.PG_Exit import *
 from cnt.PG_Welcome import *
 from cnt.Elite_Limpets import *
 from cnt.Elite_PIPS import *
+from cnt.PG_Ship_Controls import *
 
 class NV_MainNavigation(FloatLayout):
 	id='NV_MainNavigation'
@@ -36,6 +37,7 @@ class NV_MainNavigation(FloatLayout):
 		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'welcome', 2, 0, self.id, 1, lambda a: self.PageSwitch('welcome'))
 		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'elite limpets', 4, 1, self.id, 1, lambda a: self.PageSwitch('limpets'))
 		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'elite pips', 5, 0, self.id, 1, lambda a: self.PageSwitch('pips'))
+		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'ship ctrls', 6, 0, self.id, 1, lambda a: self.PageSwitch('shipctrls'))
 		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'exit', 7, 2, self.id, 1, lambda a: self.PageSwitch('exit'))
 
 	def PageSwitch(self, page):
@@ -61,6 +63,10 @@ class NV_MainNavigation(FloatLayout):
 			self.TopStatusBar.changeCaption('elite pips')
 			Logger.info('PageFunction : Pageswitch - elite pips')
 			self.mainClass.add_widget(ElitePIPSPage(self.mainClass, self.configClass, self.preloadClass))
+		if page == 'shipctrls':
+			self.TopStatusBar.changeCaption('ship controls')
+			Logger.info('PageFunction : Pageswitch - ship controls')
+			self.mainClass.add_widget(PG_Ship_Controls(self.configClass, self.preloadClass))
 		if page == 'test':
 			self.TopStatusBar.changeCaption('test')
 			Logger.info('PageFunction : Pageswitch - test')
