@@ -41,7 +41,7 @@ Config.set('graphics', 'window_state', 'normal')
 Config.set('graphics', 'resizable', False)
 # DEBUG
 Config.set('modules', 'touchring', 'scale=0.1,alpha=1')
-Config.set('modules', 'monitor', '')
+#Config.set('modules', 'monitor', '')
 # ###
 Config.write()
 from kivy.app import App
@@ -83,7 +83,7 @@ class MainLayout(FloatLayout):
 		#StatusBars
 		self.LY_TopStatusBar = LY_TopStatusBar()
 		self.add_widget(self.LY_TopStatusBar)
-		self.LY_BottomStatusBar = LY_BottomStatusBar()		
+		self.LY_BottomStatusBar = LY_BottomStatusBar()
 		self.add_widget(self.LY_BottomStatusBar)
 		#Main Navigation
 		self.add_widget(NV_MainNavigation(self, Config_LCARS, Preload_LCARS, self.LY_TopStatusBar, Info_LCARS))
