@@ -138,9 +138,9 @@ class PG_Inara(FloatLayout):
 		# ###
 
 		#DEBUG
-		if len(self.configClass.inara_username) >= 3:
-			Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'fleet', (212,155), self.Goto_FleetPage, foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
-		return
+		#if len(self.configClass.inara_username) >= 3:
+		#	Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'fleet', (212,155), self.Goto_FleetPage, foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
+		#return
 
 		if self.infoClass.cmdr_name == None and self.infoClass.cmdr_combatrank == None:
 			#Loading up INARA API Works
