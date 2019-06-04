@@ -37,7 +37,7 @@ class API_Inara():
 	def GetCMDRProfile(self):
 		payload = { "header": self._api_header(), "events" : [self._api_cmdrprofile()] }
 		resp = self.SESSION.post('https://inara.cz/inapi/v1/', json=payload)
-		json_resp = json.loads(resp.content)
+		json_resp = json.loads(resp.content.decode('utf-8'))
 
 		if json_resp['header']['eventStatus'] != requests.codes.ok:
 			Logger.critical('API Inara : ' + str(json_resp['header']['eventStatusText']))
@@ -65,7 +65,7 @@ class API_Inara():
 	def GetCmdrName(self):
 		payload = { "header": self._api_header() }
 		resp = self.SESSION.post('https://inara.cz/inapi/v1/', json=payload)
-		json_resp = json.loads(resp.content)
+		json_resp = json.loads(resp.content.decode('utf-8'))
 
 		if json_resp['header']['eventStatus'] != requests.codes.ok:
 			Logger.critical('API Inara : ' + str(json_resp['header']['eventStatusText']))
@@ -83,7 +83,7 @@ class API_Inara():
 				'isDeveloped': self.configClass.debug,
 				'APIkey': self.apikey,
 				'commanderName': self.infoClass.cmdr_name
-				}	
+				}
 		else:
 			return {
 				'appName': 'E:D RPi-Companion',
