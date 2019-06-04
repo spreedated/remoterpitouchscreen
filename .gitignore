@@ -473,4 +473,17 @@ healthchecksdb
 # Backup folder for Package Reference Convert tool in Visual Studio 2017
 MigrationBackup/
 
+### C++ ###
+# Prerequisites
+
+# Compiled Object files
+*.slo
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+
 # End of https://www.gitignore.io/api/python,visualstudio
