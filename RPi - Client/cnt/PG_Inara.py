@@ -14,6 +14,7 @@ from mod.Controls import *
 from mod.Sound import Sounds
 from mod.RemovesClears import RemovesClears
 from cnt.PG_Inara_Fleet import *
+from cnt.PG_Inara_Components import *
 
 Builder.load_string("""
 <PG_Inara>:
@@ -138,8 +139,9 @@ class PG_Inara(FloatLayout):
 		# ###
 
 		#DEBUG
-		#if len(self.configClass.inara_username) >= 3:
-		#	Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'fleet', (212,155), self.Goto_FleetPage, foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
+		#if len(self.configClass.inara_username) >= 3 and len(self.configClass.inara_password) >= 3:
+		#	Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'fleet', (212,155), lambda a: self.Goto_ChildPage('fleet'), foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
+		#	Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'components', (515,155), lambda a: self.Goto_ChildPage('components'), foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
 		#return
 
 		if self.infoClass.cmdr_name == None and self.infoClass.cmdr_combatrank == None:
@@ -167,8 +169,9 @@ class PG_Inara(FloatLayout):
 		Buttons.Inara_RankButton(self, self.configClass, self.preloadClass, self.id, 'cqc', self.infoClass.cmdr_cqcrank, (642,279), ColorConversion.RGBA_to_Float(237,26,33))
 
 		#Buttons
-		if len(self.configClass.inara_username) >= 3:
-			Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'fleet', (212,155), self.Goto_FleetPage, foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
+		if len(self.configClass.inara_username) >= 3 and len(self.configClass.inara_password) >= 3:
+			Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'fleet', (212,155), lambda a: self.Goto_ChildPage('fleet'), foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
+			Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'components', (515,155), lambda a: self.Goto_ChildPage('components'), foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
 
 	def animation(self):
 		self.hexagon_timer = Clock.schedule_interval(lambda a: self.timer(), 0.02)
@@ -200,10 +203,13 @@ class PG_Inara(FloatLayout):
 			if acc[0] <= 465:
 				self.direction = 'r'
 
-	def Goto_FleetPage(self, instance):
+	def Goto_ChildPage(self, page):
 		#Clear page of Main
 		RemovesClears.remove_mywidget(self.mainClass, self.id)
-		self.mainClass.add_widget(PG_Inara_Fleet(self.configClass, self.preloadClass, self.infoClass))
+		if page == 'fleet':
+			self.mainClass.add_widget(PG_Inara_Fleet(self.configClass, self.preloadClass, self.infoClass))
+		if page == 'components':
+			self.mainClass.add_widget(PG_Inara_Components(self.configClass, self.preloadClass, self.infoClass))
 
 	def Goto_Back_MainWindow(self):
 		self.Page_Main()

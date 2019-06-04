@@ -18,7 +18,7 @@ Builder.load_string("""
 	pos: 118,49
 	FloatLayout:
 		pos: 0,0
-		size: 665,0
+		size: 665,300
 		size_hint: None,None
 		spacing: 10
 		orientation: 'vertical'
@@ -44,6 +44,12 @@ class PG_Inara_Fleet(ScrollView):
 		status = None
 
 		self.Inara_ProcessFleet(self.Inara_GetFleet(configInstance))
+
+		if self.status != None:
+			Logger.critical('Page Inara Fleet : ' + str(self.status))
+			x = Label(size=(665,300), size_hint=(None,None), pos=(0,0), text=str(self.status), font_name='fnt/lcarsgtj3.ttf', font_size='72sp', id=self.id, halign='center', color=(0.99,0.61,0,1))
+			self.floaty.add_widget(x)
+			return
 
 		#Build Floaty (FloatLayout inside ScrollView)
 		self.fleetdetails.sort(reverse=True)
@@ -168,7 +174,7 @@ class PG_Inara_Fleet(ScrollView):
 
 	def Inara_ProcessFleet(self, rawHTML):
 		if 'Guest</a>' in rawHTML:
-			self.status = 'No Login'
+			self.status = 'No Login\nor wrong credentials'
 			return
 		elif 'timeout' in rawHTML: 
 			self.status = 'Inara Timeout'
