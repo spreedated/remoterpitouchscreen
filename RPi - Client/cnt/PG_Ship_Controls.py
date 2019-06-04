@@ -20,6 +20,19 @@ class PG_Ship_Controls(FloatLayout):
 
 		self.configClass = configClass
 
+		elements = [configClass.button0_label, configClass.button1_label, configClass.button2_label, configClass.button3_label, configClass.button4_label, configClass.button5_label, configClass.button6_label, configClass.button7_label, configClass.button8_label, configClass.button9_label, configClass.button10_label, configClass.button11_label, configClass.button12_label, configClass.button13_label, configClass.button14_label]
+		state = True
+		for element in elements:
+			if len(element) > 0:
+				state = False
+
+		if state:
+			x = Label(size=(569,285), size_hint=(None,None), pos=(168,93), text='no bindings found\nin config.conf', font_name='fnt/lcarsgtj3.ttf', font_size='72sp', id=self.id, halign='center', color=(0.99,0.61,0,1))
+			self.add_widget(x)
+			if configClass.debug:
+				Logger.info('PG_Ship_Controls : Loaded empty - no config entries!')
+			return
+
 		#First Row
 		if configClass.button0_label != '' and configClass.button0_key != '':
 			Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, str(configClass.button0_label.replace('\\n','\n')), self.pos_first_row[0], 100, lambda a: self.sendKeys(['{'+str(configClass.button0_key)+'}']))
