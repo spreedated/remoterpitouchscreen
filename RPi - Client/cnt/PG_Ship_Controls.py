@@ -21,25 +21,40 @@ class PG_Ship_Controls(FloatLayout):
 		self.configClass = configClass
 
 		#First Row
-		Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, 'fsd', self.pos_first_row[0], 100, lambda a: self.sendKeys(['{L}']))
-		Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, 'cruise', self.pos_first_row[1], 100, lambda a: self.sendKeys(['{K}']))
-		#Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, 'route', self.pos_first_row[2], 100)
-		#Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, 'news', self.pos_first_row[3], 100)
-		Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, 'flight\nasst', self.pos_first_row[4], 100, lambda a: self.sendKeys(['{-}']))
+		if configClass.button0_label != '' and configClass.button0_key != '':
+			Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, str(configClass.button0_label.replace('\\n','\n')), self.pos_first_row[0], 100, lambda a: self.sendKeys(['{'+str(configClass.button0_key)+'}']))
+		if configClass.button1_label != '' and configClass.button1_key != '':
+			Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, str(configClass.button1_label.replace('\\n','\n')), self.pos_first_row[1], 100, lambda a: self.sendKeys(['{'+str(configClass.button1_key)+'}']))
+		if configClass.button2_label != '' and configClass.button2_key != '':
+			Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, str(configClass.button2_label.replace('\\n','\n')), self.pos_first_row[2], 100, lambda a: self.sendKeys(['{'+str(configClass.button2_key)+'}']))
+		if configClass.button3_label != '' and configClass.button3_key != '':
+			Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, str(configClass.button3_label.replace('\\n','\n')), self.pos_first_row[3], 100, lambda a: self.sendKeys(['{'+str(configClass.button3_key)+'}']))
+		if configClass.button4_label != '' and configClass.button4_key != '':
+			Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, str(configClass.button4_label.replace('\\n','\n')), self.pos_first_row[4], 100, lambda a: self.sendKeys(['{'+str(configClass.button4_key)+'}']))
 
 		#Second Row
-		Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, 'heat\nsink', self.pos_second_row[0], 100, lambda a: self.sendKeys(['{H}']))
-		#Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, '---', self.pos_second_row[1], 100)
-		#Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, 'chaff', self.pos_second_row[2], 100)
-		#Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, 'ecm', self.pos_second_row[3], 100)
-		Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, 'shield\ncell', self.pos_second_row[4], 100, lambda a: self.sendKeys(['{U}']))
+		if configClass.button5_label != '' and configClass.button5_key != '':
+			Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, str(configClass.button5_label.replace('\\n','\n')), self.pos_second_row[0], 100, lambda a: self.sendKeys(['{'+str(configClass.button5_key)+'}']))
+		if configClass.button6_label != '' and configClass.button6_key != '':
+			Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, str(configClass.button6_label.replace('\\n','\n')), self.pos_second_row[1], 100, lambda a: self.sendKeys(['{'+str(configClass.button6_key)+'}']))
+		if configClass.button7_label != '' and configClass.button7_key != '':
+			Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, str(configClass.button7_label.replace('\\n','\n')), self.pos_second_row[2], 100, lambda a: self.sendKeys(['{'+str(configClass.button7_key)+'}']))
+		if configClass.button8_label != '' and configClass.button8_key != '':
+			Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, str(configClass.button8_label.replace('\\n','\n')), self.pos_second_row[3], 100, lambda a: self.sendKeys(['{'+str(configClass.button8_key)+'}']))
+		if configClass.button9_label != '' and configClass.button9_key != '':
+			Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, str(configClass.button9_label.replace('\\n','\n')), self.pos_second_row[4], 100, lambda a: self.sendKeys(['{'+str(configClass.button9_key)+'}']))
 
 		#Third Row
-		Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, 'gear', self.pos_third_row[0], 100, lambda a: self.sendKeys(['{I}']))
-		Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, 'scoop', self.pos_third_row[1], 100, lambda a: self.sendKeys(['{C}']))
-		Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, 'hard\npoints', self.pos_third_row[2], 100, lambda a: self.sendKeys(['{J}']))
-		#Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, 'silent\nrng', self.pos_third_row[3], 100)
-		Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, 'lights', self.pos_third_row[4], 100, lambda a: self.sendKeys(['{0}']))
+		if configClass.button10_label != '' and configClass.button10_key != '':
+			Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, str(configClass.button10_label.replace('\\n','\n')), self.pos_third_row[0], 100, lambda a: self.sendKeys(['{'+str(configClass.button10_key)+'}']))
+		if configClass.button11_label != '' and configClass.button11_key != '':
+			Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, str(configClass.button11_label.replace('\\n','\n')), self.pos_third_row[1], 100, lambda a: self.sendKeys(['{'+str(configClass.button11_key)+'}']))
+		if configClass.button12_label != '' and configClass.button12_key != '':
+			Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, str(configClass.button12_label.replace('\\n','\n')), self.pos_third_row[2], 100, lambda a: self.sendKeys(['{'+str(configClass.button12_key)+'}']))
+		if configClass.button13_label != '' and configClass.button13_key != '':
+			Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, str(configClass.button13_label.replace('\\n','\n')), self.pos_third_row[3], 100, lambda a: self.sendKeys(['{'+str(configClass.button13_key)+'}']))
+		if configClass.button14_label != '' and configClass.button14_key != '':
+			Buttons.RoundedSquareButton(self, configClass, preloadClass, self.id, str(configClass.button14_label.replace('\\n','\n')), self.pos_third_row[4], 100, lambda a: self.sendKeys(['{'+str(configClass.button14_key)+'}']))
 
 		if configClass.debug:
 			Logger.info('PG_Ship_Controls : Loaded!')
