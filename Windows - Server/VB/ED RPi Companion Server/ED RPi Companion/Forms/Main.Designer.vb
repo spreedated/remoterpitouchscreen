@@ -22,56 +22,44 @@ Partial Class Main
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.Button1 = New System.Windows.Forms.Button()
+        Me.Btn_Debug = New System.Windows.Forms.Button()
         Me.CheckBox1 = New System.Windows.Forms.CheckBox()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
-        Me.statIcon = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.statText = New System.Windows.Forms.ToolStripStatusLabel()
         Me.statBracketOpen = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.statIcon = New System.Windows.Forms.ToolStripStatusLabel()
         Me.statBracketClose = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.statText = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.Log_Box = New System.Windows.Forms.RichTextBox()
         Me.StatusStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
-        'Button1
+        'Btn_Debug
         '
-        Me.Button1.Location = New System.Drawing.Point(308, 79)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(51, 25)
-        Me.Button1.TabIndex = 0
-        Me.Button1.Text = "Button1"
-        Me.Button1.UseVisualStyleBackColor = True
+        Me.Btn_Debug.Location = New System.Drawing.Point(122, 12)
+        Me.Btn_Debug.Name = "Btn_Debug"
+        Me.Btn_Debug.Size = New System.Drawing.Size(64, 26)
+        Me.Btn_Debug.TabIndex = 0
+        Me.Btn_Debug.Text = "Debug"
+        Me.Btn_Debug.UseVisualStyleBackColor = True
         '
         'CheckBox1
         '
         Me.CheckBox1.AutoSize = True
-        Me.CheckBox1.Location = New System.Drawing.Point(163, 20)
+        Me.CheckBox1.Location = New System.Drawing.Point(12, 12)
         Me.CheckBox1.Name = "CheckBox1"
-        Me.CheckBox1.Size = New System.Drawing.Size(112, 17)
+        Me.CheckBox1.Size = New System.Drawing.Size(104, 17)
         Me.CheckBox1.TabIndex = 1
-        Me.CheckBox1.Text = "Advertising Server"
+        Me.CheckBox1.Text = "Advertise Server"
         Me.CheckBox1.UseVisualStyleBackColor = True
         '
         'StatusStrip1
         '
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.statBracketOpen, Me.statIcon, Me.statBracketClose, Me.statText})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 151)
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 206)
         Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(673, 22)
+        Me.StatusStrip1.Size = New System.Drawing.Size(279, 22)
         Me.StatusStrip1.TabIndex = 2
         Me.StatusStrip1.Text = "StatusStrip1"
-        '
-        'statIcon
-        '
-        Me.statIcon.AutoSize = False
-        Me.statIcon.Name = "statIcon"
-        Me.statIcon.Size = New System.Drawing.Size(10, 17)
-        Me.statIcon.Text = "+"
-        '
-        'statText
-        '
-        Me.statText.Name = "statText"
-        Me.statText.Size = New System.Drawing.Size(120, 17)
-        Me.statText.Text = "ToolStripStatusLabel2"
         '
         'statBracketOpen
         '
@@ -80,6 +68,13 @@ Partial Class Main
         Me.statBracketOpen.Size = New System.Drawing.Size(10, 17)
         Me.statBracketOpen.Text = "["
         '
+        'statIcon
+        '
+        Me.statIcon.AutoSize = False
+        Me.statIcon.Name = "statIcon"
+        Me.statIcon.Size = New System.Drawing.Size(10, 17)
+        Me.statIcon.Text = "+"
+        '
         'statBracketClose
         '
         Me.statBracketClose.AutoSize = False
@@ -87,14 +82,34 @@ Partial Class Main
         Me.statBracketClose.Size = New System.Drawing.Size(10, 17)
         Me.statBracketClose.Text = "]"
         '
+        'statText
+        '
+        Me.statText.Name = "statText"
+        Me.statText.Size = New System.Drawing.Size(120, 17)
+        Me.statText.Text = "ToolStripStatusLabel2"
+        '
+        'Log_Box
+        '
+        Me.Log_Box.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.Log_Box.Cursor = System.Windows.Forms.Cursors.IBeam
+        Me.Log_Box.DetectUrls = False
+        Me.Log_Box.Location = New System.Drawing.Point(12, 50)
+        Me.Log_Box.Name = "Log_Box"
+        Me.Log_Box.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical
+        Me.Log_Box.ShortcutsEnabled = False
+        Me.Log_Box.Size = New System.Drawing.Size(255, 144)
+        Me.Log_Box.TabIndex = 3
+        Me.Log_Box.Text = ""
+        '
         'Main
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(673, 173)
+        Me.ClientSize = New System.Drawing.Size(279, 228)
+        Me.Controls.Add(Me.Log_Box)
         Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.CheckBox1)
-        Me.Controls.Add(Me.Button1)
+        Me.Controls.Add(Me.Btn_Debug)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
         Me.MaximizeBox = False
         Me.Name = "Main"
@@ -107,11 +122,12 @@ Partial Class Main
 
     End Sub
 
-    Friend WithEvents Button1 As Button
+    Friend WithEvents Btn_Debug As Button
     Friend WithEvents CheckBox1 As CheckBox
     Friend WithEvents StatusStrip1 As StatusStrip
     Friend WithEvents statIcon As ToolStripStatusLabel
     Friend WithEvents statText As ToolStripStatusLabel
     Friend WithEvents statBracketOpen As ToolStripStatusLabel
     Friend WithEvents statBracketClose As ToolStripStatusLabel
+    Friend WithEvents Log_Box As RichTextBox
 End Class

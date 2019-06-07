@@ -47,10 +47,10 @@
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Henooh.DeviceEmulator, Version=1.1.3.10, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Henooh.DeviceEmulator.1.1.4\lib\Henooh.DeviceEmulator.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -87,7 +87,9 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Mod\Mod_AppProperties.vb" />
+    <Compile Include="Mod\Mod_SocketWork.vb" />
     <Compile Include="Mod\Mod_StatusStrip.vb" />
+    <Compile Include="Mod\Mod_WindowHandle.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -127,6 +129,10 @@
     </None>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="icon.ico" />
+    <None Include="Resources\icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

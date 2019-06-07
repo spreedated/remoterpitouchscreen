@@ -27,7 +27,7 @@ Module Mod_AppProperties
     Public Function SetSettings(ByRef Form As Form)
         With Form
             .Text = AppName()
-            '.Icon = My.Resources.icon
+            .Icon = My.Resources.icon
         End With
 
         Return True

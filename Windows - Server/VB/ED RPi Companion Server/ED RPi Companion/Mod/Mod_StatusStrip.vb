@@ -11,7 +11,7 @@
             Main.statText.Text = "Error: " & errorText
         End If
     End Sub
-    Public Sub WorkingAniStrip(ByVal state As Boolean)
+    Public Sub WorkingAniStrip(ByVal state As Boolean, ByVal Optional text As String = Nothing)
         Select Case state
             Case True
                 With AnimationTimer
@@ -19,6 +19,9 @@
                     .Interval = 100
                     .Start()
                 End With
+                If Not text = Nothing Then
+                    Main.statText.Text = text
+                End If
             Case False
                 If AnimationTimer.Enabled Then
                     With AnimationTimer
