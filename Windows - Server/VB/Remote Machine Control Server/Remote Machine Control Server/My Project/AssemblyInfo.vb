@@ -8,11 +8,11 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("Remote Machine Control Server")>
-<Assembly: AssemblyDescription("")>
+<Assembly: AssemblyTitle("E:D RPi Companion Server")>
+<Assembly: AssemblyDescription("E:D RPi Companion Server")>
 <Assembly: AssemblyCompany("")>
-<Assembly: AssemblyProduct("Remote Machine Control Server")>
-<Assembly: AssemblyCopyright("Copyright ©  2019")>
+<Assembly: AssemblyProduct("E:D RPi Companion Server")>
+<Assembly: AssemblyCopyright("2019 © Markus Karl Wackermann")>
 <Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")>
 
-<Assembly: AssemblyVersion("1.0.0.0")>
-<Assembly: AssemblyFileVersion("1.0.0.0")>
+<Assembly: AssemblyVersion("0.1.0.0")>
+<Assembly: AssemblyFileVersion("0.1.0.0")>
