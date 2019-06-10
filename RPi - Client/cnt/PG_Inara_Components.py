@@ -1,6 +1,7 @@
 import requests
 import lxml.html
 import math
+from cryptography.fernet import Fernet
 from kivy.uix.button import Button
 from kivy.uix.image import Image
 from kivy.uix.label import Label
@@ -96,7 +97,12 @@ class PG_Inara_Components(ScrollView):
 
 	# Back-End
 	def Inara_GetComponents(self, configinstance):
-		session = self.cas_login(configinstance.inara_username, configinstance.inara_password)
+		try:
+		    unciphered = Fernet(configinstance.inara_pass_key).decrypt(configinstance.inara_password).decode("utf-8")
+		except Exception as e:
+		    return 'unciphererror'
+
+		session = self.cas_login(configinstance.inara_username, unciphered)
 		if session == 'timeout':
 			return 'timeout'
 		try:
@@ -136,6 +142,9 @@ class PG_Inara_Components(ScrollView):
 			return
 		elif 'timeout' in rawHTML: 
 			self.status = 'Inara Timeout'
+			return
+		elif 'unciphererror' in rawHTML: 
+			self.status = 'Error in unciphering\npassword - corrupt keyfile'
 			return
 
 		r = Selector(text=rawHTML).xpath("//div[@class='inventorymaterial ']").extract()

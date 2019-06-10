@@ -2,6 +2,7 @@ import os
 import sys
 import configparser
 from kivy.logger import Logger
+from cryptography.fernet import Fernet
 
 class Configuration():
 	#main
@@ -12,8 +13,9 @@ class Configuration():
 	clicksounds = 1
 	#inara
 	inara_username = ''
-	inara_password = ''
+	inara_password = b''
 	inara_apikey = ''
+	inara_pass_key = b''
 	#preload
 	edassets = False
 	#ship preload
@@ -49,6 +51,7 @@ class Configuration():
 	button14_key=''
 
 	confFilePath = os.getcwd() + '/config.conf'
+	keyFilePath = os.getcwd() + '/key'
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -71,7 +74,7 @@ class Configuration():
 					self.socketfile = 'client_udp.py'
 				#inara
 				self.inara_username = str(config.get('INARA','username'))
-				self.inara_password = str(config.get('INARA','password'))
+				self.inara_password = str(config.get('INARA','password')).encode() #Converting to byte
 				self.inara_apikey = str(config.get('INARA','apikey'))
 				acc = str(config.get('PRELOAD','edassets'))
 				if acc == '1':
@@ -109,6 +112,21 @@ class Configuration():
 				self.button14_key = str(config.get('SHIPCONTROLS','button14_key'))
 				# ###
 				Logger.info('Configuration : Loaded sucessfully')
+
+				# Read/Create Key file to decrypt/encrypt password
+				if(os.path.isfile(self.keyFilePath)):
+					f = open(self.keyFilePath,'r')
+					self.inara_pass_key = f.readline().encode() # Convert string to byte (IMPORTANT)
+					f.close()
+					Logger.info('Configuration : Using existing Keyfile')
+				else:
+					acc = Fernet.generate_key().decode('utf-8')
+					f = open(self.keyFilePath,'w')
+					f.write(acc)
+					f.close()
+					self.inara_pass_key = acc.encode()
+					Logger.info('Configuration : Keyfile generated')
+				# ###
 			except Exception as e :
 				Logger.info('Configuration : ' + str(e))
 				try:

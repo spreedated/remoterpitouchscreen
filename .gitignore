@@ -3,6 +3,8 @@
 # Edit at https://www.gitignore.io/?templates=python,visualstudio
 
 config.conf
+key
+test[0-9].py
 
 ### Python ###
 # Byte-compiled / optimized / DLL files

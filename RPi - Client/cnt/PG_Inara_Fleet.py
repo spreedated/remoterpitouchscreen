@@ -1,5 +1,6 @@
 import requests
 import lxml.html
+from cryptography.fernet import Fernet
 from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.graphics import Color, Rectangle, RoundedRectangle
@@ -138,7 +139,12 @@ class PG_Inara_Fleet(ScrollView):
 
 	# Back-End
 	def Inara_GetFleet(self, configinstance):
-		session = self.cas_login(configinstance.inara_username, configinstance.inara_password)
+		try:
+		    unciphered = Fernet(configinstance.inara_pass_key).decrypt(configinstance.inara_password).decode("utf-8")
+		except Exception as e:
+		    return 'unciphererror'
+		
+		session = self.cas_login(configinstance.inara_username, unciphered)
 		if session == 'timeout':
 			return 'timeout'
 		try:
@@ -178,6 +184,9 @@ class PG_Inara_Fleet(ScrollView):
 			return
 		elif 'timeout' in rawHTML: 
 			self.status = 'Inara Timeout'
+			return
+		elif 'unciphererror' in rawHTML: 
+			self.status = 'Error in unciphering\npassword - corrupt keyfile'
 			return
 
 		r = Selector(text=rawHTML).xpath("//div[@class='shipblockcontainer']").extract()
