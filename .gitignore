@@ -4,7 +4,7 @@
 
 config.conf
 key
-test[0-9].py
+#test[0-9].py
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
