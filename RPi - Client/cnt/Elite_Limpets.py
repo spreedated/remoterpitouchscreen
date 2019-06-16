@@ -1,6 +1,5 @@
 import os
 import time
-from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label

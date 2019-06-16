@@ -81,7 +81,7 @@ class MainLayout(FloatLayout):
 		#Background
 		self.add_widget(LY_Background())
 		#StatusBars
-		self.LY_TopStatusBar = LY_TopStatusBar()
+		self.LY_TopStatusBar = LY_TopStatusBar(ApplicationInfo.appFullName)
 		self.add_widget(self.LY_TopStatusBar)
 		self.LY_BottomStatusBar = LY_BottomStatusBar()
 		self.add_widget(self.LY_BottomStatusBar)

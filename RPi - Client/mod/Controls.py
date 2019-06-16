@@ -35,11 +35,11 @@ class LCARS_ImageButton(ButtonBehavior, Image):
 class Buttons():
 	leftPositions = [(11,383),(11,336),(11,290),(11,243),(11,196),(11,150),(11,103),(11,56)]
 
-	def RoundedButton(self, configClass, preloadClass, id, labeltext, action, position, width, textsize='48sp', backgroundColor=(0.71,0,0.02,1), foregroundColor=(1,1,1,1), clickSound=True, soundFile=None):
+	def RoundedButton(self, configClass, preloadClass, id, labeltext, action, position, width, textsize='48sp', backgroundColor=(0.71,0,0.02,1), foregroundColor=(1,1,1,1), clickSound=True, soundFile=None, rad=(23,23,23,23)):
 		btn_center = LCARS_LabelButton(pos=(position[0],position[1]), size=(width,45), size_hint=(None,None), id=id)
 		with btn_center.canvas.before:
 			Color(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3])
-			RoundedRectangle(pos=btn_center.pos, size=btn_center.size, radius=[23,23,23,23])
+			RoundedRectangle(pos=btn_center.pos, size=btn_center.size, radius=[rad[0],rad[1],rad[2],rad[3]])
 		btn_lbl = LCARS_LabelButton(text=labeltext, pos=(position[0],position[1]), size=(width,45), size_hint=(None,None), color=(foregroundColor[0],foregroundColor[1],foregroundColor[2],foregroundColor[3]), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size=textsize, id=id, halign='center')
 		btn_center.add_widget(btn_lbl)
 
