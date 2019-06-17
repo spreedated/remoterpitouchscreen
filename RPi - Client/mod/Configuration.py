@@ -10,6 +10,8 @@ class Configuration():
 	socketfile = 'client_udp.py'
 	sleepBetweenKeySends = 0.1
 	pythonExecuteBinary = 'python'
+	serverIPv4addr = ''
+	serverIPv4port = 15548
 	debug = False
 	#sound
 	clicksounds = 1
@@ -78,6 +80,8 @@ class Configuration():
 					self.socketfile = 'client_udp.py'
 				self.sleepBetweenKeySends = float(config.get('MAIN','sleepBetweenKeySends'))
 				self.pythonExecuteBinary = str(config.get('MAIN','pythonExecuteBinary'))
+				self.serverIPv4addr = str(config.get('MAIN','serverIPv4addr'))
+				self.serverIPv4port = int(config.get('MAIN','serverIPv4port'))
 				#inara
 				self.inara_username = str(config.get('INARA','username'))
 				self.inara_password = str(config.get('INARA','password')).encode() #Converting to byte
@@ -151,6 +155,8 @@ class Configuration():
 				f.write('debug=0\n')
 				f.write('sleepBetweenKeySends=0.1\n')
 				f.write('pythonExecuteBinary=python\n')
+				f.write('serverIPv4addr=\n')
+				f.write('serverIPv4port=15548\n')
 				f.write('\n[PRELOAD]\n')
 				f.write('edassets=0\n')
 				f.write('\n[SOUND]\n')

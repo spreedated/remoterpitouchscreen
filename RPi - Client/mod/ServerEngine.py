@@ -20,5 +20,5 @@ class ServerEngine(object):
 
 				time.sleep(configClass.sleepBetweenKeySends)
 		except Exception as e:
-		    Logger.fatal('ServerEngine[sendKeys]:' + str(e))
+		    Logger.fatal('ServerEngine[sendKeys] Exception:' + str(e))
 		
