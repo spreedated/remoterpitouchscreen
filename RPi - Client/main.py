@@ -27,10 +27,12 @@ if os.name == 'nt':
 	Config.set('graphics', 'show_cursor', '1')
 	Config.set('graphics', 'fullscreen', 'false')
 	Config.set('graphics', 'multisamples', '9')
+	Config.set('graphics', 'borderless', '0')
 elif os.name == 'posix':
 	Config.set('graphics', 'fullscreen', 'true')
 	Config.set('graphics', 'multisamples', '0') # disable AA for better performance
 	Config.set('graphics', 'show_cursor', '0')
+	Config.set('graphics', 'borderless', '1')
 Config.set('kivy', 'exit_on_escape', '1') # Exit with escape key
 Config.set('kivy', 'keyboard_mode', 'systemanddock') # 'systemanddock' - one virtual keyboard docked to a screen side. -- 'systemandmulti' - one virtual keyboard for every widget request. -- SYSTEMS = also accept input from real keyboard device
 Config.set('kivy','keyboard_layout', 'qwertz')
@@ -39,6 +41,7 @@ Config.set('kivy','window_icon','ico/icon.ico')
 Config.set('kivy', 'show_fps', 1)
 Config.set('graphics', 'window_state', 'normal')
 Config.set('graphics', 'resizable', False)
+Config.set('graphics', 'allow_screensaver', '0')
 # DEBUG
 Config.set('modules', 'touchring', 'scale=0.1,alpha=1')
 #Config.set('modules', 'monitor', '')
