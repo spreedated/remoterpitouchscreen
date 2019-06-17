@@ -1,4 +1,3 @@
-from kivy.app import App
 from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.uix.floatlayout import FloatLayout
@@ -222,6 +221,7 @@ class PG_Configure(FloatLayout):
 		self.preloadClass = preloadClass
 		self.infoClass = infoClass
 
+		#Inara
 		Buttons.RoundedButton(self, self.configClass, self.preloadClass, self.id, 'inara', lambda a: self.Goto_ChildPage('inara'), self.leftSidePositions[0], 127, '24sp', ColorConversion.RGBA_to_Float(255,255,51), ColorConversion.RGBA_to_Float(0,0,0), rad=self.rads[0])
 
 	def Goto_ChildPage(self, page):

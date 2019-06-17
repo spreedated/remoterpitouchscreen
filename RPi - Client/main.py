@@ -32,7 +32,7 @@ elif os.name == 'posix':
 	Config.set('graphics', 'multisamples', '0') # disable AA for better performance
 	Config.set('graphics', 'show_cursor', '0')
 Config.set('kivy', 'exit_on_escape', '1') # Exit with escape key
-Config.set('kivy', 'keyboard_mode', 'systemanddock') # or 'systemandmulti' - still no real difference here
+Config.set('kivy', 'keyboard_mode', 'systemanddock') # 'systemanddock' - one virtual keyboard docked to a screen side. -- 'systemandmulti' - one virtual keyboard for every widget request. -- SYSTEMS = also accept input from real keyboard device
 Config.set('kivy','keyboard_layout', 'qwertz')
 Config.set('kivy','pause_on_minimize', '0')
 Config.set('kivy','window_icon','ico/icon.ico')

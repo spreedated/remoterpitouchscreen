@@ -14,9 +14,7 @@ class RemovesClears():
 							child.unload()
 						if type(child) == VideoPlayer:
 							child.state = 'stop'
-						#className.remove_widget(child)
 						className.clear_widgets([child])
-		Logger.info('PageFunction : Pages cleared')
 
 	def remove_mywidget(className, widget_id):
 		for x in range(5):
@@ -27,5 +25,4 @@ class RemovesClears():
 							child.unload()
 						if type(child) == VideoPlayer:
 							child.state = 'stop'
-						#className.remove_widget(child)
 						className.clear_widgets([child])

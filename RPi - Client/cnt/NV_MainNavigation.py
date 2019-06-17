@@ -11,9 +11,7 @@ from mod.RemovesClears import RemovesClears
 from cnt.PG_Inara import *
 from cnt.PG_Exit import *
 from cnt.PG_Welcome import *
-from cnt.Elite_Limpets import *
-from cnt.Elite_PIPS import *
-from cnt.PG_Ship_Controls import *
+from cnt.PG_ShipControls import *
 from cnt.PG_Configure import *
 import mod.Information as ApplicationInfo
 
@@ -34,12 +32,12 @@ class NV_MainNavigation(FloatLayout):
 		self.TopStatusBar = topStatusBarClass
 		self.infoClass = infoClass
 
-		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'debug', 0, 2, self.id, 1, lambda a: self.PageSwitch('test'))
-		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'inara', 1, 2, self.id, 1, lambda a: self.PageSwitch('inara'))
-		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'welcome', 2, 0, self.id, 1, lambda a: self.PageSwitch('welcome'))
-		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'elite limpets', 4, 1, self.id, 1, lambda a: self.PageSwitch('limpets'))
-		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'elite pips', 5, 0, self.id, 1, lambda a: self.PageSwitch('pips'))
-		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'ship ctrls', 3, 0, self.id, 1, lambda a: self.PageSwitch('shipctrls'))
+		if self.configClass.debug == True:
+			Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'debug', 1, 2, self.id, 1, lambda a: self.PageSwitch('test'))
+
+		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'welcome', 0, 0, self.id, 1, lambda a: self.PageSwitch('welcome'))
+		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'inara', 2, 2, self.id, 1, lambda a: self.PageSwitch('inara'))
+		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'ship ctrls', 4, 0, self.id, 1, lambda a: self.PageSwitch('shipctrls'))
 		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'configure', 6, 0, self.id, 1, lambda a: self.PageSwitch('configure'))
 		Buttons.Button_LeftNav(self, self.configClass, self.preloadClass, 'exit', 7, 2, self.id, 1, lambda a: self.PageSwitch('exit'))
 
@@ -48,33 +46,31 @@ class NV_MainNavigation(FloatLayout):
 
 		if page == 'exit':
 			self.TopStatusBar.changeCaption('shutdown')
-			Logger.info('PageFunction : Pageswitch - Shutdown')
+			if self.configClass.debug == True:
+				Logger.info('PageFunction : Pageswitch - Shutdown')
 			self.mainClass.add_widget(PG_Exit(self.mainClass, self.configClass, self.preloadClass))
 		if page == 'inara':
 			self.TopStatusBar.changeCaption('inara')
-			Logger.info('PageFunction : Pageswitch - Inara')
+			if self.configClass.debug == True:
+				Logger.info('PageFunction : Pageswitch - Inara')
 			self.mainClass.add_widget(PG_Inara(self.mainClass, self.configClass, self.preloadClass, self.infoClass))
 		if page == 'welcome':
 			self.TopStatusBar.changeCaption(ApplicationInfo.appFullName)
-			Logger.info('PageFunction : Pageswitch - welcome')
+			if self.configClass.debug == True:
+				Logger.info('PageFunction : Pageswitch - welcome')
 			self.mainClass.add_widget(PG_Welcome(self.configClass, self.preloadClass))
-		if page == 'limpets':
-			self.TopStatusBar.changeCaption('elite limpets')
-			Logger.info('PageFunction : Pageswitch - elite limpets')
-			self.mainClass.add_widget(EliteLimpetsPage(self.mainClass, self.configClass, self.preloadClass))
-		if page == 'pips':
-			self.TopStatusBar.changeCaption('elite pips')
-			Logger.info('PageFunction : Pageswitch - elite pips')
-			self.mainClass.add_widget(ElitePIPSPage(self.mainClass, self.configClass, self.preloadClass))
 		if page == 'shipctrls':
 			self.TopStatusBar.changeCaption('ship controls')
-			Logger.info('PageFunction : Pageswitch - ship controls')
-			self.mainClass.add_widget(PG_Ship_Controls(self.configClass, self.preloadClass))
+			if self.configClass.debug == True:
+				Logger.info('PageFunction : Pageswitch - ship controls')
+			self.mainClass.add_widget(PG_ShipControls(self.mainClass, self.configClass, self.preloadClass, self.infoClass))
 		if page == 'configure':
 			self.TopStatusBar.changeCaption('configure')
-			Logger.info('PageFunction : Pageswitch - configure')
+			if self.configClass.debug == True:
+				Logger.info('PageFunction : Pageswitch - configure')
 			self.mainClass.add_widget(PG_Configure(self.mainClass, self.configClass, self.preloadClass, self.infoClass))
 		if page == 'test':
 			self.TopStatusBar.changeCaption('test')
-			Logger.info('PageFunction : Pageswitch - test')
+			if self.configClass.debug == True:
+				Logger.info('PageFunction : Pageswitch - test')
 			print(self.infoClass.cmdr_combatrank)

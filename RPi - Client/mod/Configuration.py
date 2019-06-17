@@ -8,9 +8,12 @@ class Configuration():
 	#main
 	socket = 'udp'
 	socketfile = 'client_udp.py'
+	sleepBetweenKeySends = 0.1
+	pythonExecuteBinary = 'python'
 	debug = False
 	#sound
 	clicksounds = 1
+	additionalSounds = 1
 	#inara
 	inara_username = ''
 	inara_password = b''
@@ -63,6 +66,7 @@ class Configuration():
 				#Set Config Vars
 				#sound
 				self.clicksounds = int(config.get('SOUND','clicksounds'))
+				self.additionalSounds = int(config.get('SOUND','additionalSounds'))
 				#main
 				self.socket = str(config.get('MAIN','socket'))
 				acc = str(config.get('MAIN','debug'))
@@ -72,6 +76,8 @@ class Configuration():
 					self.socketfile = 'client_tcp.py'
 				if self.socket == 'udp':
 					self.socketfile = 'client_udp.py'
+				self.sleepBetweenKeySends = float(config.get('MAIN','sleepBetweenKeySends'))
+				self.pythonExecuteBinary = str(config.get('MAIN','pythonExecuteBinary'))
 				#inara
 				self.inara_username = str(config.get('INARA','username'))
 				self.inara_password = str(config.get('INARA','password')).encode() #Converting to byte
@@ -143,10 +149,13 @@ class Configuration():
 				f.write('[MAIN]\n')
 				f.write('socket=udp\n')
 				f.write('debug=0\n')
+				f.write('sleepBetweenKeySends=0.1\n')
+				f.write('pythonExecuteBinary=python\n')
 				f.write('\n[PRELOAD]\n')
 				f.write('edassets=0\n')
 				f.write('\n[SOUND]\n')
 				f.write('clicksounds=1\n')
+				f.write('additionalSounds=1\n')
 				f.write('\n[INARA]\n')
 				f.write('username=\n')
 				f.write('password=\n')
