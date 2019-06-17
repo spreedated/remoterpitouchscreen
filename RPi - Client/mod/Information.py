@@ -1,5 +1,5 @@
 appname = 'E:D RPi Companion'
-version = 'v0.2.3'
+version = 'v0.2.4'
 appFullName =  appname + ' ' + version
 
 

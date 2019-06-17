@@ -59,25 +59,23 @@ class PG_Inara_Components(ScrollView):
 
 		for component in self.components:
 			#print(ship)
-			x = Label(size=(330,30), size_hint=(None,None), pos=(next_pos_x,next_pos_y))
-			with x.canvas.before:
-				Color(1,1,1,0.2)
-				RoundedRectangle(size=x.size, size_hint=(None,None),  pos=x.pos, radius=(4,4,4,4))
+			xSize = (330,30)
+			xPos = (next_pos_x, next_pos_y)
 
 			#Icon
 			if component[2] != None:
-				x_Icon = Image(source='img/matgrades/'+component[2], pos=(x.pos[0]+10, x.pos[1]+8), size=(13,13), size_hint=(None,None), id=self.id)
-				x.add_widget(x_Icon)
+				x_Icon = Image(source='img/matgrades/'+component[2], pos=(xPos[0]+10, xPos[1]+8), size=(13,13), size_hint=(None,None), id=self.id)
+				self.floaty.add_widget(x_Icon)
 
 			#Name
-			x_Name = Label(text=component[0], markup=True, color=(1,1,1,0.8), pos=(x.pos[0]+30, x.pos[1]+1), size=(260,x.size[1]), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='20sp', id=self.id, halign='left', text_size=(260,x.size[1]), shorten_from='right', split_str=' ', shorten=True)
-			x.add_widget(x_Name)
+			x_Name = Label(text=component[0], markup=True, color=(1,1,1,0.8), pos=(xPos[0]+30, xPos[1]+1), size=(260,xSize[1]), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='20sp', id=self.id, halign='left', text_size=(260,xSize[1]), shorten_from='right', split_str=' ', shorten=True)
+			self.floaty.add_widget(x_Name)
 
 			#Have
-			x_Have = Label(text=str(component[1]), markup=True, color=(1,1,1,1), pos=(x.pos[0]+295, x.pos[1]+1), size=(30,x.size[1]), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', id=self.id, halign='right', text_size=(30,x.size[1]), shorten_from='right', split_str=' ', shorten=True)
-			x.add_widget(x_Have)
+			x_Have = Label(text=str(component[1]), markup=True, color=(1,1,1,1), pos=(xPos[0]+295, xPos[1]+1), size=(30,xSize[1]), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', id=self.id, halign='right', text_size=(30,xSize[1]), shorten_from='right', split_str=' ', shorten=True)
+			self.floaty.add_widget(x_Have)
 
-			addup = x.size[1] + 1
+			addup = xSize[1] + 1
 			next_pos_y += addup
 
 			#check when to switch to next column
@@ -88,7 +86,7 @@ class PG_Inara_Components(ScrollView):
 			elif halftime >= -1:
 				floaty_y += (addup)
 			
-			self.floaty.add_widget(x)
+			#self.floaty.add_widget(x)
 
 		#set size of floatlayout
 		self.floaty.size = (self.floaty.size[0], (floaty_y))
