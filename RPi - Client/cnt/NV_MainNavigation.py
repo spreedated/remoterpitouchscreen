@@ -1,10 +1,5 @@
-from kivy.uix.label import Label
-from kivy.uix.image import Image
-from kivy.properties import StringProperty, ObjectProperty
-from kivy.graphics import Color, Rectangle
 from kivy.uix.floatlayout import FloatLayout
 from kivy.logger import Logger
-from mod.Color import ColorConversion
 from mod.Controls import *
 from mod.Sound import Sounds
 from mod.RemovesClears import RemovesClears

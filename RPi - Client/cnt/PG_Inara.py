@@ -4,11 +4,9 @@ from kivy.lang import Builder
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.image import Image
-from kivy.properties import StringProperty, ObjectProperty
-from kivy.graphics import Color, Rectangle
 from kivy.clock import Clock
 from kivy.logger import Logger
-from mod.Color import ColorConversion
+from mod.Color import ColorConversion, Colors
 from mod.API_Works import API_Inara
 from mod.Controls import *
 from mod.Sound import Sounds
@@ -146,7 +144,7 @@ class PG_Inara(FloatLayout):
 
 		if self.infoClass.cmdr_name == None and self.infoClass.cmdr_combatrank == None:
 			#Loading up INARA API Works
-			lbl_info = Label(text='Loading...', pos=(204,288), size=(577,120), size_hint=(None,None), color=(0.99,0.61,0,1), markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='64sp', id=self.id, halign='center')
+			lbl_info = Label(text='Loading...', pos=(204,288), size=(577,120), size_hint=(None,None), color=Colors.standardFont, markup=True, font_name='fnt/lcarsgtj3.ttf', font_size='64sp', id=self.id, halign='center')
 			self.add_widget(lbl_info)
 		
 			x = API_Inara(self.configClass, self.infoClass)
@@ -156,7 +154,7 @@ class PG_Inara(FloatLayout):
 				lbl_info.text = x.errormsg
 				return # Stop here if something went wrong, like wrong api key
 		
-			Sounds.PlaySound(self.preloadClass, 'establishing_datalink.wav')
+			Sounds.PlaySound(self.preloadClass, self.configClass, 'establishing_datalink.wav')
 			self.remove_widget(lbl_info)
 			# ###
 		elif self.configClass.debug:
@@ -170,8 +168,8 @@ class PG_Inara(FloatLayout):
 
 		#Buttons
 		if len(self.configClass.inara_username) >= 3 and len(self.configClass.inara_password) >= 3:
-			Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'fleet', (212,155), lambda a: self.Goto_ChildPage('fleet'), foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
-			Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'components', (515,155), lambda a: self.Goto_ChildPage('components'), foregroundColor=ColorConversion.RGBA_to_Float(0,0,0))
+			Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'fleet', (212,155), lambda a: self.Goto_ChildPage('fleet'), foregroundColor=Colors.black)
+			Buttons.Inara_MainButton(self, self.mainClass, self.configClass, self.preloadClass, self.id, 'components', (515,155), lambda a: self.Goto_ChildPage('components'), foregroundColor=Colors.black)
 
 	def animation(self):
 		self.hexagon_timer = Clock.schedule_interval(lambda a: self.timer(), 0.02)

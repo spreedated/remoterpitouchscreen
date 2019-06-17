@@ -6,6 +6,7 @@ from kivy.uix.label import Label
 from kivy.properties import StringProperty, ObjectProperty
 from kivy.clock import Clock
 from kivy.lang import Builder
+from mod.Color import Colors
 
 Builder.load_string("""
 <LY_TopStatusBar>:
@@ -43,10 +44,10 @@ class LY_TopStatusBar(FloatLayout):
 	def __init__(self, lblText='neXn-Systems', **kwargs):
 		super().__init__(**kwargs)
 
-		self.lbl_box = Label(text=lblText, pos=(459,440), size=(225,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='28sp', id=self.id)
+		self.lbl_box = Label(text=lblText, pos=(459,440), size=(225,25), size_hint=(None,None), color=Colors.standardFont, font_name='fnt/lcarsgtj3.ttf', font_size='28sp', id=self.id)
 		self.lbl_box.bind(texture_size=self.lbl_box.setter('size'))
-		self.lbl_dot = Label(text='', pos=(690,445), size=(5,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='28sp', id=self.id)
-		self.lbl_time = Label(text='', pos=(705,445), size=(60,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='28sp', id=self.id)
+		self.lbl_dot = Label(text='', pos=(690,445), size=(5,25), size_hint=(None,None), color=Colors.standardFont, font_name='fnt/lcarsgtj3.ttf', font_size='28sp', id=self.id)
+		self.lbl_time = Label(text='', pos=(705,445), size=(60,25), size_hint=(None,None), color=Colors.standardFont, font_name='fnt/lcarsgtj3.ttf', font_size='28sp', id=self.id)
 
 		self.add_widget(self.lbl_box)
 		self.add_widget(self.lbl_dot)
@@ -81,12 +82,12 @@ class LY_BottomStatusBar(FloatLayout):
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 
-		lbl_box = Label(text='stardate:', pos=(212,8), size=(70,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', id=self.id)
+		lbl_box = Label(text='stardate:', pos=(212,8), size=(70,25), size_hint=(None,None), color=Colors.standardFont, font_name='fnt/lcarsgtj3.ttf', font_size='24sp', id=self.id)
 		lbl_box.bind(texture_size=lbl_box.setter('size'))
 		self.add_widget(lbl_box)
 
 		rndint = random.randint(10000,99999)
-		self.lbl_date = Label(text=str(rndint) + '.00', pos=(289,8), size=(100,25), size_hint=(None,None), color=(0.99,0.61,0,1), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', id=self.id)
+		self.lbl_date = Label(text=str(rndint) + '.00', pos=(289,8), size=(100,25), size_hint=(None,None), color=Colors.standardFont, font_name='fnt/lcarsgtj3.ttf', font_size='24sp', id=self.id)
 		self.lbl_date.bind(texture_size=self.lbl_date.setter('size'))
 		self.add_widget(self.lbl_date)
 

@@ -2,7 +2,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.graphics import Color, Rectangle, RoundedRectangle
 from kivy.properties import ObjectProperty
-from mod.Color import ColorConversion
+from mod.Color import ColorConversion, Colors
 from kivy.lang import Builder
 
 Builder.load_string("""
@@ -77,5 +77,5 @@ Builder.load_string("""
 
 class LY_Background(FloatLayout):
 	id='LY_Background'
-	elementscolor=ColorConversion.RGBA_to_Float(241,223,111)
-	black=ColorConversion.RGBA_to_Float(0,0,0)
+	elementscolor=Colors.lightyellow
+	black=Colors.black

@@ -6,7 +6,7 @@ from kivy.uix.label import Label
 from kivy.graphics import Color, Rectangle
 from kivy.properties import ObjectProperty
 from kivy.logger import Logger
-from mod.Color import ColorConversion
+from mod.Color import ColorConversion, Colors
 from mod.Controls import *
 from mod.RemovesClears import RemovesClears
 from cnt.PG_ShipControls_Controls import *
@@ -64,11 +64,10 @@ class PG_ShipControls(FloatLayout):
 	preloadClass = None
 	infoClass = None
 
-	mainelementcolor = ColorConversion.RGBA_to_Float(156,160,255)
-	black = ColorConversion.RGBA_to_Float(0,0,0)
-	orange = ColorConversion.RGBA_to_Float(254,154,0)
-	blue = ColorConversion.RGBA_to_Float(156,160,255)
-	red = ColorConversion.RGBA_to_Float(237,26,33)
+	black = Colors.black
+	orange = Colors.orange
+	blue = Colors.skyBlue
+	red = Colors.neonRed
 
 	def __init__(self, mainClass, configClass, preloadClass, infoClass, **kwargs):
 		super().__init__(**kwargs)
@@ -80,9 +79,9 @@ class PG_ShipControls(FloatLayout):
 
 		self.sidewinder.texture = self.preloadClass.returnPreloadedAsset('sidewinder_dorsal.png')
 
-		Buttons.RoundedButton(self, self.configClass, self.preloadClass, self.id, 'ship ctrls', lambda a: self.Goto_ChildPage('shipctrls'), (138,374), 127, '24sp', self.orange, ColorConversion.RGBA_to_Float(0,0,0), rad=(10,10,10,10))
-		Buttons.RoundedButton(self, self.configClass, self.preloadClass, self.id, 'limpets', lambda a: self.Goto_ChildPage('limpets'), (491,49), 127, '24sp', self.blue, ColorConversion.RGBA_to_Float(0,0,0), rad=(10,10,10,10))
-		Buttons.RoundedButton(self, self.configClass, self.preloadClass, self.id, 'pips', lambda a: self.Goto_ChildPage('pips'), (623,374), 127, '24sp', self.red, ColorConversion.RGBA_to_Float(0,0,0), rad=(10,10,10,10))
+		Buttons.RoundedButton(self, self.configClass, self.preloadClass, self.id, 'ship ctrls', lambda a: self.Goto_ChildPage('shipctrls'), (138,374), 127, '24sp', self.orange, Colors.black, rad=(10,10,10,10))
+		Buttons.RoundedButton(self, self.configClass, self.preloadClass, self.id, 'limpets', lambda a: self.Goto_ChildPage('limpets'), (491,49), 127, '24sp', self.blue, Colors.black, rad=(10,10,10,10))
+		Buttons.RoundedButton(self, self.configClass, self.preloadClass, self.id, 'pips', lambda a: self.Goto_ChildPage('pips'), (623,374), 127, '24sp', self.red, Colors.black, rad=(10,10,10,10))
 
 	def Goto_ChildPage(self, page):
 		#Clear page of Main

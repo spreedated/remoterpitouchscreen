@@ -4,10 +4,11 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.graphics import Color, Rectangle
 from kivy.logger import Logger
-from mod.Color import ColorConversion
+from mod.Color import Colors
 from mod.Controls import *
 from mod.RemovesClears import RemovesClears
 from cnt.PG_Configure_Inara import *
+from cnt.PG_Configure_Sounds import *
 
 Builder.load_string("""
 <PG_Configure>:
@@ -205,9 +206,9 @@ class PG_Configure(FloatLayout):
 	preloadClass = None
 	infoClass = None
 
-	mainelementcolor = ColorConversion.RGBA_to_Float(156,160,255)
-	black = ColorConversion.RGBA_to_Float(0,0,0)
-	contentelementcolor = ColorConversion.RGBA_to_Float(153,205,255)
+	mainelementcolor = Colors.skyBlue
+	black = Colors.black
+	contentelementcolor = Colors.lightBlue
 
 	leftSidePositions = [(125,315),(255,315),(125,250),(255,250),(125,184),(255,184),(125,118),(255,118)]
 	rightSidePositions = [(518,315),(648,315),(518,250),(648,250),(518,184),(648,184),(518,118),(648,118)]
@@ -222,10 +223,14 @@ class PG_Configure(FloatLayout):
 		self.infoClass = infoClass
 
 		#Inara
-		Buttons.RoundedButton(self, self.configClass, self.preloadClass, self.id, 'inara', lambda a: self.Goto_ChildPage('inara'), self.leftSidePositions[0], 127, '24sp', ColorConversion.RGBA_to_Float(255,255,51), ColorConversion.RGBA_to_Float(0,0,0), rad=self.rads[0])
+		Buttons.RoundedButton(self, self.configClass, self.preloadClass, self.id, 'inara', lambda a: self.Goto_ChildPage('inara'), self.leftSidePositions[0], 127, '24sp', Colors.yellow, Colors.black, rad=self.rads[0])
+		#Sound
+		Buttons.RoundedButton(self, self.configClass, self.preloadClass, self.id, 'sounds', lambda a: self.Goto_ChildPage('sound'), self.rightSidePositions[1], 127, '24sp', Colors.yellow, Colors.black, rad=self.rads[1])
 
 	def Goto_ChildPage(self, page):
 		#Clear page of Main
 		RemovesClears.remove_mywidget(self.mainClass, self.id)
 		if page == 'inara':
 			self.mainClass.add_widget(PG_Configure_Inara(self.mainClass, self.configClass, self.preloadClass, self.infoClass))
+		if page == 'sound':
+			self.mainClass.add_widget(PG_Configure_Sounds(self.mainClass, self.configClass, self.preloadClass, self.infoClass))

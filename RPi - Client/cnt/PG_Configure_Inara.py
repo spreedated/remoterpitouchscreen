@@ -1,12 +1,10 @@
 import configparser
 from kivy.lang import Builder
-from kivy.clock import Clock
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
-from kivy.graphics import Color, Rectangle
 from kivy.properties import ObjectProperty
 from kivy.logger import Logger
-from mod.Color import ColorConversion
+from mod.Color import ColorConversion, Colors
 from mod.Controls import *
 from mod.RemovesClears import RemovesClears
 from cryptography.fernet import Fernet
@@ -90,8 +88,8 @@ class PG_Configure_Inara(FloatLayout):
 	preloadClass = None
 	infoClass = None
 
-	mainelementcolor = ColorConversion.RGBA_to_Float(254,154,0)
-	black = ColorConversion.RGBA_to_Float(0,0,0)
+	mainelementcolor = Colors.orange
+	black = Colors.black
 
 	username = ObjectProperty()
 	password = ObjectProperty()
@@ -118,7 +116,7 @@ class PG_Configure_Inara(FloatLayout):
 		self.apikey.text = self.configClass.inara_apikey
 
 		#Save Button
-		Buttons.RoundedButton(self, self.configClass, self.preloadClass, self.id, 'save configuration', self.saveConfig, (450,50), 288, '36sp', ColorConversion.RGBA_to_Float(181,0,6), ColorConversion.RGBA_to_Float(0,0,0))
+		Buttons.RoundedButton(self, self.configClass, self.preloadClass, self.id, 'save configuration', self.saveConfig, (450,50), 288, '36sp', Colors.darkRed, Colors.black)
 
 	def saveConfig(self, instance):
 		try:
@@ -145,18 +143,18 @@ class PG_Configure_Inara(FloatLayout):
 
 		except Exception as e:
 			self.showFail()
-			print(e)
+			print(str(e))
 
 	def showSave(self):
 		#Clear page of Main
 		RemovesClears.remove_mywidget(self.mainClass, self.id)
-		x = Label(text='saved\nsuccessfully!', font_size='96sp', size_hint=(None,None), size=(665,166), pos=(118,166), font_name='fnt/lcarsgtj3.ttf', color=(0.99,0.61,0,1), halign='center', id=self.id)
+		x = Label(text='saved\nsuccessfully!', font_size='96sp', size_hint=(None,None), size=(665,166), pos=(118,166), font_name='fnt/lcarsgtj3.ttf', color=Colors.standardFont, halign='center', id=self.id)
 
 		self.mainClass.add_widget(x)
 
 	def showFail(self):
 		#Clear page of Main
 		RemovesClears.remove_mywidget(self.mainClass, self.id)
-		x = Label(text='something went\nwrong!', font_size='96sp', size_hint=(None,None), size=(665,166), pos=(118,166), font_name='fnt/lcarsgtj3.ttf', color=(0.99,0.61,0,1),halign='center', id=self.id)
+		x = Label(text='something went\nwrong!', font_size='96sp', size_hint=(None,None), size=(665,166), pos=(118,166), font_name='fnt/lcarsgtj3.ttf', color=Colors.standardFont, halign='center', id=self.id)
 
 		self.mainClass.add_widget(x)

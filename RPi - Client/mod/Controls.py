@@ -6,7 +6,7 @@ from kivy.graphics import Color, Rectangle, RoundedRectangle
 from kivy.uix.scrollview import ScrollView
 from kivy.properties import StringProperty
 from kivy.graphics.instructions import InstructionGroup
-from mod.Color import ColorConversion
+from mod.Color import ColorConversion, Colors
 from mod.Sound import Sounds
 
 Builder.load_string("""
@@ -48,21 +48,21 @@ class Buttons():
 			if action != None:
 				x.bind(on_press=action)
 			if clickSound and configClass.clicksounds == 1 and soundFile == None:
-				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass))
+				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass, configClass))
 			if soundFile != None:
-				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, soundFile))
+				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, configClass, soundFile))
 		self.add_widget(btn_center)
 
 	# Left Navigation
 	def Button_LeftNav(self, configClass, preloadClass, btnText, btnEnumPosition, btnEnumColor, id, btnClickSounds=0, action=None):
 		btn = LCARS_LabelButton(pos=Buttons.leftPositions[btnEnumPosition], size=(96,40), size_hint=(None,None), id=id)
 		with btn.canvas.before:
-			if btnEnumColor == 0: #Yellow
-				Color(1,1,0.2,1)
+			if btnEnumColor == 0: #yellow
+				Color(Colors.yellow[0],Colors.yellow[1],Colors.yellow[2],Colors.yellow[3])
 			if btnEnumColor == 1: #Light yellow
-				Color(0.95,0.99,0.44,1)
-			if btnEnumColor == 2: #Blue
-				Color(0.6,0.8,1,1)
+				Color(Colors.lightyellow[0],Colors.lightyellow[1],Colors.lightyellow[2],Colors.lightyellow[3])
+			if btnEnumColor == 2: #Light blue
+				Color(Colors.lightBlue[0],Colors.lightBlue[1],Colors.lightBlue[2],Colors.lightBlue[3])
 			Rectangle(pos=btn.pos, size=btn.size)
 		btn_txt = Label(text=btnText, pos=(btn.pos[0]+2,btn.pos[1]-5), size=(50,13), size_hint=(None,None), font_name='fnt/lcarsgtj3.ttf', font_size='24sp', color=(0,0,0,1), id=id)
 		btn_txt.bind(texture_size=btn_txt.setter('size'))
@@ -73,7 +73,7 @@ class Buttons():
 			if action != None:
 				x.bind(on_press=action)
 			if configClass.clicksounds == 1:
-				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass))
+				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass, configClass))
 		self.add_widget(btn)
 	# ###
 
@@ -90,9 +90,9 @@ class Buttons():
 			if action != None:
 				x.bind(on_press=action)
 			if clickSound and configClass.clicksounds == 1 and soundFile == None:
-				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass))
+				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass, configClass))
 			if soundFile != None:
-				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, soundFile))
+				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, configClass, soundFile))
 		self.add_widget(btn)
 
 	def RoundedButtonSquare(self, configClass, preloadClass, id, labeltext, action, position, width, height, iconImage, textsize='48sp', backgroundColor=(0.71,0,0.02,1), foregroundColor=(0,0,0,1), clickSound=True, soundFile=None):	
@@ -114,9 +114,9 @@ class Buttons():
 			if action != None:
 				x.bind(on_press=action)
 			if clickSound and configClass.clicksounds == 1 and soundFile == None:
-				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass))
+				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass, configClass))
 			if soundFile != None:
-				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, soundFile))
+				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, configClass, soundFile))
 		self.add_widget(btn_Center)
 
 	def Inara_RankButton(self, configClass, preloadClass, id, rankClass, rank, position, color):
@@ -148,9 +148,9 @@ class Buttons():
 			if action != None:
 				x.bind(on_press=action)
 			if clickSound and configClass.clicksounds == 1 and soundFile == None:
-				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass))
+				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass, configClass))
 			if soundFile != None:
-				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, soundFile))
+				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, configClass, soundFile))
 			self.add_widget(x)
 
 	def lblDisplayShip(self, mainClass, configClass, preloadClass, id, text, action=None, textsize='18sp', backgroundColor=(0,0.66,0.35,0.4), foregroundColor=(0,0,0,1), clickSound=True, soundFile=None):
@@ -168,15 +168,15 @@ class Buttons():
 			if action != None:
 				x.bind(on_press=action)
 			if clickSound and configClass.clicksounds == 1 and soundFile == None:
-				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass))
+				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass, configClass))
 			if soundFile != None:
-				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, soundFile))
+				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, configClass, soundFile))
 			mainClass.add_widget(x)
 
 	def RoundedSquareButton(self, configClass, preloadClass, id, labeltext, position, widthheight, action=None, backgroundColor=(1,1,1,0.2), foregroundColor=(1,1,1,1), clickSound=True, soundFile=None):
 		btn = LCARS_LabelButton(pos=position, size=(widthheight,widthheight), size_hint=(None,None))
 		with btn.canvas.after:
-			Color(1,1,1,0.2)
+			Color(Colors.white[0],Colors.white[1],Colors.white[2], 0.2)
 			RoundedRectangle(pos=btn.pos, size=btn.size, radius=(15,15,15,15))
 		btn_txt = Label(pos=position, size=(widthheight,widthheight), size_hint=(None,None), text=labeltext, font_name='fnt/lcarsgtj3.ttf', font_size='36sp', color=(1,1,1,1), halign='center')
 
@@ -185,7 +185,7 @@ class Buttons():
 			if action != None:
 				x.bind(on_press=action)
 			if clickSound and configClass.clicksounds == 1 and soundFile == None:
-				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass))
+				x.bind(on_press=lambda a:Sounds.PlayClickSound(preloadClass, configClass))
 			if soundFile != None:
-				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, soundFile))
+				x.bind(on_press=lambda a:Sounds.PlaySound(preloadClass, configClass, soundFile))
 			self.add_widget(x)

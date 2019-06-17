@@ -1,11 +1,10 @@
 import os
 from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.label import Label
-from kivy.graphics import Color, Rectangle, RoundedRectangle
 from kivy.logger import Logger
 from kivy.lang import Builder
 from mod.Controls import Buttons
 from mod.ServerEngine import *
+from mod.Color import Colors
 
 class PG_ShipControls_Controls(FloatLayout):
 	id='PG_ShipControls_Controls'
@@ -28,7 +27,7 @@ class PG_ShipControls_Controls(FloatLayout):
 				state = False
 
 		if state:
-			x = Label(size=(569,285), size_hint=(None,None), pos=(168,93), text='no bindings found\nin config.conf', font_name='fnt/lcarsgtj3.ttf', font_size='72sp', id=self.id, halign='center', color=(0.99,0.61,0,1))
+			x = Label(size=(569,285), size_hint=(None,None), pos=(168,93), text='no bindings found\nin config.conf', font_name='fnt/lcarsgtj3.ttf', font_size='72sp', id=self.id, halign='center', color=Colors.standardFont)
 			self.add_widget(x)
 			if configClass.debug:
 				Logger.info('PG_Ship_Controls : Loaded empty - no config entries!')

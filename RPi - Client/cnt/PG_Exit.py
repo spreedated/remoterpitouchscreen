@@ -2,8 +2,6 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.label import Label
-from kivy.graphics import Color, Rectangle
 from kivy.logger import Logger
 from mod.Controls import *
 from mod.RemovesClears import RemovesClears
@@ -51,7 +49,7 @@ class PG_Exit(FloatLayout):
 		RemovesClears.remove_mywidget(self.mainClass, 'Navigation')
 
 		if self.configClass.additionalSounds:
-			Sounds.PlaySound(self.preloadClass, 'complete.wav')
+			Sounds.PlaySound(self.preloadClass, self.configClass, 'complete.wav')
 			Clock.schedule_interval(lambda a: App.get_running_app().stop(), 4.5)
 		else:
 			App.get_running_app().stop()

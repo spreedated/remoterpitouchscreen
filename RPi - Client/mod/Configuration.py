@@ -14,6 +14,7 @@ class Configuration():
 	serverIPv4port = 15548
 	debug = False
 	#sound
+	volume = 100
 	clicksounds = 1
 	additionalSounds = 1
 	#inara
@@ -67,6 +68,7 @@ class Configuration():
 				config.read(self.confFilePath)
 				#Set Config Vars
 				#sound
+				self.volume = int(config.get('SOUND','volume'))
 				self.clicksounds = int(config.get('SOUND','clicksounds'))
 				self.additionalSounds = int(config.get('SOUND','additionalSounds'))
 				#main
@@ -160,6 +162,7 @@ class Configuration():
 				f.write('\n[PRELOAD]\n')
 				f.write('edassets=0\n')
 				f.write('\n[SOUND]\n')
+				f.write('volume=100\n')
 				f.write('clicksounds=1\n')
 				f.write('additionalSounds=1\n')
 				f.write('\n[INARA]\n')
